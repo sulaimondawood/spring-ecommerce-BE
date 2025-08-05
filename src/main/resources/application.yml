@@ -14,3 +14,6 @@ spring:
     hibernate:
       ddl-auto: create
 
+
+jwt:
+  secret: MTdCGwG/ZMAngD7j6OMgy8Y+RiAhLQyukw1gmAMU8d0=
