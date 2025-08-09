@@ -1,13 +1,17 @@
 package com.dawood.e_commerce.exceptions;
 
+import com.dawood.e_commerce.dtos.response.ErrorDetails;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -23,6 +27,37 @@ public class GlobalExceptionHandler {
         Map<String, String> response = new HashMap<>();
         response.put("message", ex.getMessage() != null? ex.getMessage() : "User already exists");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<ErrorDetails> handleValidationError(MethodArgumentNotValidException ex){
+
+        log.error("Validation Exception: {}",ex.getMessage());
+        Map<String, String> validationErrors = new HashMap<>();
+
+        ex.getBindingResult().getFieldErrors()
+                .forEach((error)->{
+                    validationErrors.put(error.getField(),error.getDefaultMessage());
+                });
+
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .code("VALIDATION_ERROR")
+                .message("Input validation failed")
+                .validationErrors(validationErrors)
+                .build();
+
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorDetails> handleGlobalException(Exception ex){
+
+        log.error("Unexpected error occurred {}",ex.getMessage());
+
+        ErrorDetails error = ErrorDetails.builder()
+                .code("INTERNAL_SERVER_ERROR")
+                .message("An unexpected error occurred")
+                .build();
+
+        return ResponseEntity.badRequest().body(error);
     }
 
 }
