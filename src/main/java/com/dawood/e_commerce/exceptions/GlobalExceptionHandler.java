@@ -45,6 +45,8 @@ public class GlobalExceptionHandler {
                 .validationErrors(validationErrors)
                 .build();
 
+        return ResponseEntity.badRequest().body(errorDetails);
+
     }
 
     @ExceptionHandler(Exception.class)
