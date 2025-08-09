@@ -1,7 +1,9 @@
 package com.dawood.e_commerce.services;
 
+import com.dawood.e_commerce.dtos.response.UserResponseDto;
 import com.dawood.e_commerce.entities.User;
 import com.dawood.e_commerce.exceptions.UserNotFoundException;
+import com.dawood.e_commerce.mapper.UserMapper;
 import com.dawood.e_commerce.repository.UserRepository;
 import com.dawood.e_commerce.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,8 @@ public class UserService {
                 .orElseThrow(()->new UserNotFoundException());
     }
 
-//    public List<US>
+    public List<UserResponseDto> getAllUser(){
+        return userRepository.findAll().stream().map(UserMapper::toDTO).toList();
+    }
 
 }

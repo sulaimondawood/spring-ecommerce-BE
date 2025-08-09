@@ -1,6 +1,7 @@
 package com.dawood.e_commerce.mapper;
 
 import com.dawood.e_commerce.dtos.response.SignupResponse;
+import com.dawood.e_commerce.dtos.response.UserResponseDto;
 import com.dawood.e_commerce.entities.User;
 
 public class UserMapper {
@@ -16,5 +17,20 @@ public class UserMapper {
         res.setUpdatedAt(user.getUpdatedAt());
 
         return res;
+    }
+
+    public static UserResponseDto toDTO(User user){
+
+         UserResponseDto response = UserResponseDto.builder()
+                .email(user.getEmail())
+                 .uuid(user.getUuid())
+                .role(user.getRole())
+                .phoneNumber(user.getPhoneNumber())
+                .fullname(user.getFullname())
+                .email(user.getEmail())
+                .build();
+
+         return response;
+
     }
 }
