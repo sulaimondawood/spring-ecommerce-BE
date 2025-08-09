@@ -1,5 +1,6 @@
 package com.dawood.e_commerce.utils;
 
+import com.dawood.e_commerce.services.CustomUserDetailsImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -9,15 +10,17 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
 import javax.crypto.SecretKey;
-import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
-public class JwtProvider {
+public class JwtUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(JwtProvider.class);
+    private static final Logger log = LoggerFactory.getLogger(JwtUtils.class);
     @Value("${jwt.secret}")
     private String key;
 
@@ -33,8 +36,22 @@ public class JwtProvider {
     }
 
 
-    public String generateToken(){
-        return null;
+    public String generateToken(UserDetails userDetails){
+
+        Map<String,Object> claims = new HashMap<>();
+
+        claims.put("role", userDetails.getAuthorities()
+                .stream()
+                .map(authority->authority.getAuthority())
+                .toList());
+
+        return Jwts.builder()
+                .subject(userDetails.getUsername())
+                .claims(claims)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis()+86400000))
+                .signWith(getSecretKey())
+                .compact();
     }
 
     public Claims parseToken(String jwt){

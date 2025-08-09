@@ -1,15 +1,34 @@
 package com.dawood.e_commerce.controllers;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.dawood.e_commerce.dtos.request.LoginRequest;
+import com.dawood.e_commerce.dtos.request.SignupRequest;
+import com.dawood.e_commerce.dtos.response.LoginReponse;
+import com.dawood.e_commerce.dtos.response.SignupResponse;
+import com.dawood.e_commerce.services.AuthService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    @GetMapping
-    public String home(){
-        return "Spring ecommerce web application";
+    private final AuthService authService;
+
+
+    @PostMapping("/register")
+    public ResponseEntity<SignupResponse> createUser(@RequestBody @Valid SignupRequest request){
+
+        SignupResponse res = authService.createUser(request);
+        return new ResponseEntity<>(res, HttpStatus.CREATED);
     }
+
+    @PostMapping("login")
+    public ResponseEntity<LoginReponse> login(@RequestBody @Valid LoginRequest request){
+        return new ResponseEntity<>(authService.login(request),HttpStatus.OK);
+    }
+
 }
