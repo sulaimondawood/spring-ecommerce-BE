@@ -10,10 +10,10 @@ type = 'JSON'
 raw = '''
 {
   fullname: "Dawood Sulaimon",
-  "email": "dawood_partner@gmail.com",
+  "email": "dawood_arter@gmail.com",
   "password": "123456789",
-//  role: "CUSTOMER",
-  role: "PARTNER",
+  role: "CUSTOMER",
+//  role: "PARTNER",
   phoneNumber: "08134567654"
 }'''
 ```

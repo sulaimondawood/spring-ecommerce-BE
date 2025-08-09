@@ -19,7 +19,8 @@ public class UserService {
     private final JwtUtils jwtUtils;
 
     public User getUserByJwtToken(String jwt){
-        String username = jwtUtils.extractUsername(jwt);
+        String token = jwtUtils.extractTokenFromHeader(jwt);
+        String username = jwtUtils.extractUsername(token);
         return getUserByEmail(username);
     }
 
@@ -28,7 +29,7 @@ public class UserService {
                 .orElseThrow(()->new UserNotFoundException());
     }
 
-    public List<UserResponseDto> getAllUser(){
+    public List<UserResponseDto> getAllUsers(){
         return userRepository.findAll().stream().map(UserMapper::toDTO).toList();
     }
 

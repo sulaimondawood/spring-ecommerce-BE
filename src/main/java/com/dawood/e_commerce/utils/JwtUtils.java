@@ -71,4 +71,11 @@ public class JwtUtils {
         return parseToken(jwt).getSubject();
     }
 
+    public String extractTokenFromHeader(String jwt){
+        if(jwt != null){
+            return jwt.substring(7);
+        }
+        return null;
+    }
+
 }

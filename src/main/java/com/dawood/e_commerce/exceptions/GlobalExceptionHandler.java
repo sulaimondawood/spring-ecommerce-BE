@@ -1,6 +1,7 @@
 package com.dawood.e_commerce.exceptions;
 
 import com.dawood.e_commerce.dtos.response.ErrorDetails;
+import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,15 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    public ResponseEntity<ErrorDetails> jwtExceptionHandler(JwtException ex){
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .message(ex.getMessage())
+                .code("INVALID_TOKEN")
+                .build();
+
+        return ResponseEntity.badRequest().body(errorDetails);
+    }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorDetails> usernamePasswordHandler(BadCredentialsException ex){
