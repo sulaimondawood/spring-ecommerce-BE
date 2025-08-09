@@ -2,7 +2,7 @@ package com.dawood.e_commerce.controllers;
 
 import com.dawood.e_commerce.dtos.request.LoginRequest;
 import com.dawood.e_commerce.dtos.request.SignupRequest;
-import com.dawood.e_commerce.dtos.response.LoginReponse;
+import com.dawood.e_commerce.dtos.response.LoginResponse;
 import com.dawood.e_commerce.dtos.response.SignupResponse;
 import com.dawood.e_commerce.services.AuthService;
 import jakarta.validation.Valid;
@@ -27,7 +27,7 @@ public class AuthController {
     }
 
     @PostMapping("login")
-    public ResponseEntity<LoginReponse> login(@RequestBody @Valid LoginRequest request){
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request){
         return new ResponseEntity<>(authService.login(request),HttpStatus.OK);
     }
 

@@ -28,10 +28,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Map<String,String>> userNotFoundHandler(UserNotFoundException ex){
-        Map<String, String> response = new HashMap<>();
-        response.put("message","User not found");
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorDetails> userNotFoundHandler(UserNotFoundException ex){
+
+        ErrorDetails errorDetails = new ErrorDetails();
+        errorDetails.setCode("NOT_FOUND");
+        errorDetails.setMessage(ex.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)

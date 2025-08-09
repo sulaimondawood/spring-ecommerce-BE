@@ -2,6 +2,7 @@ package com.dawood.e_commerce.exceptions;
 
 public class UserNotFoundException extends EcommerceException{
     public UserNotFoundException() {
+        super("User not found");
     }
 
     public UserNotFoundException(String message) {

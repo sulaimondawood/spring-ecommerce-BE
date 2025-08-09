@@ -2,13 +2,12 @@ package com.dawood.e_commerce.services;
 
 import com.dawood.e_commerce.dtos.request.LoginRequest;
 import com.dawood.e_commerce.dtos.request.SignupRequest;
-import com.dawood.e_commerce.dtos.response.LoginReponse;
+import com.dawood.e_commerce.dtos.response.LoginResponse;
 import com.dawood.e_commerce.dtos.response.SignupResponse;
 import com.dawood.e_commerce.entities.Cart;
 import com.dawood.e_commerce.entities.User;
 import com.dawood.e_commerce.enums.UserRole;
 import com.dawood.e_commerce.exceptions.UserAlreadyExistsException;
-import com.dawood.e_commerce.exceptions.UsernamePasswordException;
 import com.dawood.e_commerce.mapper.UserMapper;
 import com.dawood.e_commerce.repository.CartRepository;
 import com.dawood.e_commerce.repository.UserRepository;
@@ -16,20 +15,14 @@ import com.dawood.e_commerce.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -61,7 +54,7 @@ public class AuthService {
         return UserMapper.toSignupResponse(userRepository.save(user));
     }
 
-    public LoginReponse login(LoginRequest request){
+    public LoginResponse login(LoginRequest request){
 
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(),
@@ -79,7 +72,7 @@ public class AuthService {
                     .findFirst()
                     .orElse(UserRole.CUSTOMER.name());
 
-            LoginReponse response = new LoginReponse();
+            LoginResponse response = new LoginResponse();
 
             response.setToken(token);
             response.setRole(role);
