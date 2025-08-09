@@ -1,19 +1,24 @@
 package com.dawood.e_commerce.entities;
 
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
+
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.util.UUID;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@Embeddable
+@Entity
 @EntityListeners(AuditingEntityListener.class)
-public class BusinessDetails {
+public class SellerProfile {
+
+    @Id
+    @GeneratedValue
+    private UUID id;
 
     private String businessName;
 
@@ -26,5 +31,8 @@ public class BusinessDetails {
     private String businessImage;
 
     private String businessBanner;
+
+    @OneToOne
+    private User user;
 
 }

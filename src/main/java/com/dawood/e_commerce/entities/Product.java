@@ -47,7 +47,7 @@ public class Product {
     private String color;
 
     @ManyToOne
-    private Seller seller;
+    private User seller;
 
     @ElementCollection
     private List<String> images = new ArrayList<>();

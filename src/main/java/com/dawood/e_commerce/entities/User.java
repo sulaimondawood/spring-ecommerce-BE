@@ -1,5 +1,6 @@
 package com.dawood.e_commerce.entities;
 
+import com.dawood.e_commerce.enums.AccountStatus;
 import com.dawood.e_commerce.enums.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,6 +26,11 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 public class User {
 
+    @PrePersist
+    public void prePersit(){
+        this.isEmailVerified = false;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID uuid;
@@ -32,6 +39,7 @@ public class User {
 
     private String phoneNumber;
 
+    @Column(unique = true)
     private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -40,11 +48,25 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
+    private Boolean isEmailVerified;
+
+    @Enumerated
+    private AccountStatus accountStatus = AccountStatus.NOT_VERIFIED;
+
     @OneToMany
     private Set<Address> addresses = new HashSet<>();
 
     @ManyToMany
     private Set<Coupon> usedCoupons = new HashSet<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private SellerProfile sellerProfile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private BankDetails bankDetails;
+
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
+    private List<Product> products;
 
     @OneToOne
     @JsonIgnore

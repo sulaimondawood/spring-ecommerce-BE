@@ -4,19 +4,28 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@Embeddable
+@Entity
 @EntityListeners(AuditingEntityListener.class)
 public class BankDetails {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
     private String accountNumber;
 
     private String accountHolderName;
 
     private String bankName;
+
+    @OneToOne
+    private User user;
 
 }
