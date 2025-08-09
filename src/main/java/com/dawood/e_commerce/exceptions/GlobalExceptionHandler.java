@@ -4,6 +4,7 @@ import com.dawood.e_commerce.dtos.response.ErrorDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -14,6 +15,17 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorDetails> usernamePasswordHandler(BadCredentialsException ex){
+
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .message(ex.getMessage())
+                .code("BAD_CREDENTIALS")
+                .build();
+
+        return ResponseEntity.badRequest().body(errorDetails);
+    }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Map<String,String>> userNotFoundHandler(UserNotFoundException ex){
@@ -29,6 +41,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorDetails> handleValidationError(MethodArgumentNotValidException ex){
 
         log.error("Validation Exception: {}",ex.getMessage());
