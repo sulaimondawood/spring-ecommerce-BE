@@ -1,6 +1,7 @@
 package com.dawood.e_commerce.repository;
 
 import com.dawood.e_commerce.entities.User;
+import com.dawood.e_commerce.enums.AccountStatus;
 import com.dawood.e_commerce.enums.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -16,4 +17,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmailAndRole(String email, UserRole role);
 
     List<User> findByRole(UserRole role);
+
+    List<User> findByAccountStatus(AccountStatus status);
 }
