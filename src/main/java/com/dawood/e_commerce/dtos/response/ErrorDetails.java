@@ -16,5 +16,7 @@ public class ErrorDetails {
 
     private String message;
 
+    private String error;
+
     private Map<String,String> validationErrors;
 }

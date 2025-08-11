@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +18,16 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorDetails> methodArgumentTypeMismatcHandler(MethodArgumentTypeMismatchException ex){
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .error("Invalid request parameter")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.badRequest().body(errorDetails);
+    }
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ErrorDetails> usernameNotFoundHandler(UsernameNotFoundException ex){

@@ -62,8 +62,6 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private SellerProfile sellerProfile;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private BankDetails bankDetails;
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
     private List<Product> products;

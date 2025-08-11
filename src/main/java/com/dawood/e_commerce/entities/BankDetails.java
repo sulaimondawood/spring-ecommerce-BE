@@ -10,14 +10,8 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
-@Entity
-@EntityListeners(AuditingEntityListener.class)
+@Embeddable
 public class BankDetails {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
 
     private String accountNumber;
 
@@ -25,7 +19,5 @@ public class BankDetails {
 
     private String bankName;
 
-    @OneToOne
-    private User user;
 
 }

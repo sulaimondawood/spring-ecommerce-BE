@@ -1,6 +1,7 @@
 package com.dawood.e_commerce.services;
 
 import com.dawood.e_commerce.dtos.response.SellerResponseDTO;
+import com.dawood.e_commerce.entities.SellerProfile;
 import com.dawood.e_commerce.entities.User;
 import com.dawood.e_commerce.enums.AccountStatus;
 import com.dawood.e_commerce.enums.UserRole;
@@ -44,9 +45,9 @@ public class SellerService {
 
     public void setupSellerProfile(String jwt){
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Object principal  = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        UserDetails userDetails = customUserDetails.loadUserByUsername(username);
+        UserDetails userDetails = (UserDetails) principal;
 
         UserRole userRole = userDetails.getAuthorities()
                 .stream()
@@ -54,8 +55,12 @@ public class SellerService {
                 .map(role->UserRole.valueOf(role.getAuthority()))
                 .orElse(UserRole.CUSTOMER);
 
-        User user = userService.getUserByEmailAndRole(jwt, userRole);
+        User seller = userService.getUserByEmailAndRole(jwt, userRole);
 
+        SellerProfile sellerProfile =new SellerProfile();
+
+//        seller.setSellerProfile();
+dd
     }
 
 

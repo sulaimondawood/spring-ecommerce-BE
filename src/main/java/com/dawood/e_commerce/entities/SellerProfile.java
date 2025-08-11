@@ -20,17 +20,11 @@ public class SellerProfile {
     @GeneratedValue
     private UUID id;
 
-    private String businessName;
+    @Embedded
+    BusinessDetails businessDetails = new BusinessDetails();
 
-    private String businessEmail;
-
-    private String businessAddress;
-
-    private String businessNumber;
-
-    private String businessImage;
-
-    private String businessBanner;
+    @Embedded
+    BankDetails BankDetails = new BankDetails();
 
     @OneToOne
     private User user;
