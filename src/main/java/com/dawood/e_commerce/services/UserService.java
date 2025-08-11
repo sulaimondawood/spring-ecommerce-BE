@@ -2,6 +2,7 @@ package com.dawood.e_commerce.services;
 
 import com.dawood.e_commerce.dtos.response.UserResponseDto;
 import com.dawood.e_commerce.entities.User;
+import com.dawood.e_commerce.enums.UserRole;
 import com.dawood.e_commerce.exceptions.UserNotFoundException;
 import com.dawood.e_commerce.mapper.UserMapper;
 import com.dawood.e_commerce.repository.UserRepository;
@@ -31,6 +32,15 @@ public class UserService {
 
     public List<UserResponseDto> getAllUsers(){
         return userRepository.findAll().stream().map(UserMapper::toDTO).toList();
+    }
+
+    public User getUserByEmailAndRole(String jwt, UserRole role){
+        String token = jwtUtils.extractTokenFromHeader(jwt);
+        String username = jwtUtils.extractUsername(token);
+
+        return userRepository.findByEmailAndRole(username,role)
+                .orElseThrow(()->new UserNotFoundException());
+
     }
 
 }

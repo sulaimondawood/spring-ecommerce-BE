@@ -17,15 +17,6 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    public ResponseEntity<ErrorDetails> jwtExceptionHandler(JwtException ex){
-        ErrorDetails errorDetails = ErrorDetails.builder()
-                .message(ex.getMessage())
-                .code("INVALID_TOKEN")
-                .build();
-
-        return ResponseEntity.badRequest().body(errorDetails);
-    }
-
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorDetails> usernamePasswordHandler(BadCredentialsException ex){
 
