@@ -22,7 +22,7 @@ public class CartItem {
     @GeneratedValue
     private UUID id;
 
-    @OneToOne(mappedBy = "cartItem")
+    @ManyToOne()
     private Product product;
 
     private int quantity = 1;

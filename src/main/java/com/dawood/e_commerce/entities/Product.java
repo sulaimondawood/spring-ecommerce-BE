@@ -1,5 +1,6 @@
 package com.dawood.e_commerce.entities;
 
+import com.dawood.e_commerce.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -28,11 +29,20 @@ public class Product {
 
     private String description;
 
+    private String brand;
+
     private long price;
 
     private long mrpPrice;
 
     private int discount;
+
+    private int stockQuantity;
+
+    private boolean inStock;
+
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
 
     @ManyToMany
     @JoinTable(
@@ -52,7 +62,7 @@ public class Product {
     @ElementCollection
     private List<String> images = new ArrayList<>();
 
-    @OneToOne
+    @OneToMany(mappedBy = "product")
     private CartItem cartItem;
 
     @OneToMany(mappedBy = "product")
