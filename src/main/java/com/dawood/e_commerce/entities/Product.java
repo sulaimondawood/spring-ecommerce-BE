@@ -29,8 +29,6 @@ public class Product {
 
     private String description;
 
-    private String brand;
-
     private long price;
 
     private long mrpPrice;
@@ -62,8 +60,8 @@ public class Product {
     @ElementCollection
     private List<String> images = new ArrayList<>();
 
-    @OneToMany(mappedBy = "product")
-    private CartItem cartItem;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<CartItem> cartItem;
 
     @OneToMany(mappedBy = "product")
     private List<Review> reviews = new ArrayList<>();

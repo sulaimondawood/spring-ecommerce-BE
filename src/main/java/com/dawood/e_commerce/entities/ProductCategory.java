@@ -25,6 +25,7 @@ public class ProductCategory {
     private UUID id;
 
     @NotBlank(message = "Category name is required")
+    @Column(unique = true, nullable = false)
     private String name;
 
     @CreatedDate
