@@ -1,6 +1,5 @@
 package com.dawood.e_commerce.controllers;
 
-import com.dawood.e_commerce.dtos.request.BankDetailsDTO;
 import com.dawood.e_commerce.dtos.request.SellerProfileDTO;
 import com.dawood.e_commerce.dtos.response.SellerResponseDTO;
 import com.dawood.e_commerce.entities.BankDetails;
@@ -64,7 +63,7 @@ public class SellerController {
     }
 
     @PatchMapping("/account/business-details")
-    public ResponseEntity<BusinessDetails> updateBusinessDetaiils(@RequestBody BusinessDetails request){
+    public ResponseEntity<BusinessDetails> updateBusinessDetails(@RequestBody BusinessDetails request){
         return new ResponseEntity<>(sellerService.updateBusinessInfo(request), HttpStatus.OK);
     }
 }
