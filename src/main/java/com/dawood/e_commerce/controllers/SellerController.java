@@ -1,14 +1,22 @@
 package com.dawood.e_commerce.controllers;
 
+import com.dawood.e_commerce.dtos.request.BankDetailsDTO;
+import com.dawood.e_commerce.dtos.request.SellerProfileDTO;
 import com.dawood.e_commerce.dtos.response.SellerResponseDTO;
+import com.dawood.e_commerce.entities.BankDetails;
+import com.dawood.e_commerce.entities.BusinessDetails;
+import com.dawood.e_commerce.entities.User;
 import com.dawood.e_commerce.enums.AccountStatus;
 import com.dawood.e_commerce.services.SellerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -34,9 +42,29 @@ public class SellerController {
         return new ResponseEntity<>(sellerService.getSellerById(sellerId), HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<SellerResponseDTO> setupSellerAccount(){
-        return null;
+    @PostMapping("/account/setup")
+    public ResponseEntity<Map<String,String>> setupSellerAccount(@Valid @RequestBody SellerProfileDTO request, @RequestHeader("Authorization") String jwt ){
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message","Account setup is successful");
+
+        sellerService.setupSellerProfile(jwt, request);
+
+        return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
 
+    @GetMapping("/account/profile")
+    public ResponseEntity<User> getSellerProfile(@RequestHeader("Authorization") String jwt){
+        return new ResponseEntity<>(sellerService.getSellerProfile(jwt),HttpStatus.OK);
+    }
+
+    @PatchMapping("/account/bank")
+    public ResponseEntity<BankDetails> updateBankDetails(@Valid @RequestBody BankDetails request){
+        return ResponseEntity.ok().body(sellerService.updateBankDetails(request));
+    }
+
+    @PatchMapping("/account/business-details")
+    public ResponseEntity<BusinessDetails> updateBusinessDetaiils(@RequestBody BusinessDetails request){
+        return new ResponseEntity<>(sellerService.updateBusinessInfo(request), HttpStatus.OK);
+    }
 }

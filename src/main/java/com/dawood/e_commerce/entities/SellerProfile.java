@@ -1,6 +1,7 @@
 package com.dawood.e_commerce.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -27,6 +28,7 @@ public class SellerProfile {
     BankDetails BankDetails = new BankDetails();
 
     @OneToOne
-    private User user;
+    @JsonIgnore
+    private User seller;
 
 }

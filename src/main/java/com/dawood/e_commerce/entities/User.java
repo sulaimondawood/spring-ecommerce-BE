@@ -50,7 +50,7 @@ public class User {
 
     private Boolean isEmailVerified;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus = AccountStatus.NOT_VERIFIED;
 
     @OneToMany
@@ -59,9 +59,8 @@ public class User {
     @ManyToMany
     private Set<Coupon> usedCoupons = new HashSet<>();
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "seller", cascade = CascadeType.ALL)
     private SellerProfile sellerProfile;
-
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
     private List<Product> products;
