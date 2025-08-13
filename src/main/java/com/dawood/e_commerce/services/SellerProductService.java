@@ -2,11 +2,23 @@ package com.dawood.e_commerce.services;
 
 import com.dawood.e_commerce.dtos.request.ProductRequestDTO;
 import com.dawood.e_commerce.dtos.response.ProductResponseDTO;
+import com.dawood.e_commerce.entities.Product;
+import com.dawood.e_commerce.entities.ProductCategory;
+import com.dawood.e_commerce.entities.User;
+import com.dawood.e_commerce.enums.ProductStatus;
+import com.dawood.e_commerce.enums.UserRole;
+import com.dawood.e_commerce.exceptions.ProductException;
+import com.dawood.e_commerce.exceptions.ProductNotFoundException;
+import com.dawood.e_commerce.mapper.ProductMapper;
+import com.dawood.e_commerce.repository.CategoryRepository;
 import com.dawood.e_commerce.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -14,17 +26,72 @@ import java.util.UUID;
 public class SellerProductService {
 
     private final ProductRepository productRepository;
+    private final UserService userService;
+    private final CategoryRepository categoryRepository;
 
     public ProductResponseDTO createProduct(ProductRequestDTO requestDTO){
 
-        return null;
+        SecurityContext ctx = SecurityContextHolder.getContext();
+        String email = ctx.getAuthentication().getName();
+
+        User seller = userService.getUserByEmail(email);
+
+        if(!seller.getRole().equals(UserRole.SELLER)){
+            throw new SecurityException("Only seller can create a product");
+        }
+
+        if (requestDTO.getCategory() == null || requestDTO.getCategory().isEmpty()) {
+            throw new IllegalArgumentException("Product must have at least one category");
+        }
+
+        List<UUID> categoryIds = requestDTO.getCategory();
+
+        List<ProductCategory> categories = categoryRepository.findAllById(categoryIds);
+
+        Product product = Product.builder()
+                .color(requestDTO.getColor())
+                .description(requestDTO.getDescription())
+                .price(requestDTO.getPrice())
+                .name(requestDTO.getName())
+                .discount(requestDTO.getDiscount())
+                .inStock(requestDTO.getStockQuantity() > 0)
+                .images(requestDTO.getImages())
+                .mrpPrice(requestDTO.getMrpPrice())
+                .stockQuantity(requestDTO.getStockQuantity())
+                .size(requestDTO.getSize())
+                .seller(seller)
+                .category(categories)
+                .status(ProductStatus.IN_STOCK)
+                .build();
+
+        return ProductMapper.toDTO(product);
     }
 
     public void deleteProduct(UUID productId){
-
+        Product product = ProductMapper.toModel(getSingleProduct(productId));
+        productRepository.delete(product);
     }
 
-    public ProductResponseDTO updateProduct(ProductRequestDTO requestDTO){
+    public ProductResponseDTO getSingleProduct(UUID productId){
+        Product product = productRepository.findById(productId)
+                .orElseThrow(()->new ProductNotFoundException());
+
+        return ProductMapper.toDTO(product);
+    }
+
+    public ProductResponseDTO updateProduct(ProductRequestDTO requestDTO, UUID productId){
+
+        SecurityContext ctx = SecurityContextHolder.getContext();
+        String email = ctx.getAuthentication().getName();
+
+        User seller = userService.getUserByEmail(email, "Seller not found");
+
+        Product existingProduct = ProductMapper.toModel(getSingleProduct(productId));
+
+        if(!seller.getUuid().equals(existingProduct.getSeller().getUuid())){
+            throw new ProductException();
+        }
+
         return null;
     }
 
@@ -33,5 +100,9 @@ public class SellerProductService {
     }
 
 
+    private int calculateDiscount(long mrpPrice, long price){
+        int discount = (int) ((int) mrpPrice-price);
+        return (int) ((discount/mrpPrice)*100);
+    }
 
 }

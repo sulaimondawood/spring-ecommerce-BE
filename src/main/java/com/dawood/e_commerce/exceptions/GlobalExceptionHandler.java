@@ -20,6 +20,16 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<ErrorDetails> securityExceptionHandler(SecurityException ex){
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .error(ex.getMessage())
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.badRequest().body(errorDetails);
+    }
+
     @ExceptionHandler(ProductCategoryException.class)
     public ResponseEntity<ErrorDetails> ProductCategoryHandler(ProductCategoryException ex){
         ErrorDetails errorDetails = ErrorDetails.builder()

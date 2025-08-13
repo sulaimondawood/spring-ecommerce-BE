@@ -16,6 +16,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @EqualsAndHashCode
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -25,16 +26,21 @@ public class Product {
     @GeneratedValue
     private UUID id;
 
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
     private long price;
 
+    @Column(nullable = false)
     private long mrpPrice;
 
     private int discount;
 
+    @Column(nullable = false)
     private int stockQuantity;
 
     private boolean inStock;

@@ -30,6 +30,11 @@ public class UserService {
                 .orElseThrow(()->new UserNotFoundException());
     }
 
+    public User getUserByEmail(String email, String message){
+        return userRepository.findByEmail(email)
+                .orElseThrow(()->new UserNotFoundException(message));
+    }
+
     public List<UserResponseDto> getAllUsers(){
         return userRepository.findAll().stream().map(UserMapper::toDTO).toList();
     }

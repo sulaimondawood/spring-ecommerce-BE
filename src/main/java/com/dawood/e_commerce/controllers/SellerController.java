@@ -1,11 +1,14 @@
 package com.dawood.e_commerce.controllers;
 
+import com.dawood.e_commerce.dtos.request.ProductRequestDTO;
 import com.dawood.e_commerce.dtos.request.SellerProfileDTO;
+import com.dawood.e_commerce.dtos.response.ProductResponseDTO;
 import com.dawood.e_commerce.dtos.response.SellerResponseDTO;
 import com.dawood.e_commerce.entities.BankDetails;
 import com.dawood.e_commerce.entities.BusinessDetails;
 import com.dawood.e_commerce.entities.User;
 import com.dawood.e_commerce.enums.AccountStatus;
+import com.dawood.e_commerce.services.SellerProductService;
 import com.dawood.e_commerce.services.SellerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ import java.util.UUID;
 public class SellerController {
 
     private final SellerService sellerService;
+    private final SellerProductService sellerProductService;
 
 
     @GetMapping
@@ -65,5 +69,10 @@ public class SellerController {
     @PatchMapping("/account/business-details")
     public ResponseEntity<BusinessDetails> updateBusinessDetails(@RequestBody BusinessDetails request){
         return new ResponseEntity<>(sellerService.updateBusinessInfo(request), HttpStatus.OK);
+    }
+
+    @PostMapping("/create-product")
+    public  ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO productRequestDTO){
+        return new ResponseEntity<>(sellerProductService.createProduct(productRequestDTO),HttpStatus.CREATED);
     }
 }
