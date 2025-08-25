@@ -30,7 +30,6 @@ public class SellerService {
 
     private final UserRepository userRepository;
     private final UserService userService;
-    private final CustomUserDetailsImpl customUserDetails;
     private final JwtUtils jwtUtils;
 
 

@@ -1,8 +1,6 @@
 package com.dawood.e_commerce.dtos.request;
 
 import com.dawood.e_commerce.enums.UserRole;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

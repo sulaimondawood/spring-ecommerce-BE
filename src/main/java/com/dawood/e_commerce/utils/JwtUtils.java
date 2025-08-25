@@ -1,6 +1,5 @@
 package com.dawood.e_commerce.utils;
 
-import com.dawood.e_commerce.services.CustomUserDetailsImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

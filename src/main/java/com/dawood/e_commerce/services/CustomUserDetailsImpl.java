@@ -2,7 +2,6 @@ package com.dawood.e_commerce.services;
 
 import com.dawood.e_commerce.entities.User;
 import com.dawood.e_commerce.enums.UserRole;
-import com.dawood.e_commerce.exceptions.UserNotFoundException;
 import com.dawood.e_commerce.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
