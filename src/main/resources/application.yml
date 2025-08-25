@@ -4,15 +4,15 @@ server:
 
 spring:
   datasource:
-    username: postgres
+    username: root
     password: admin
-    url: jdbc:postgresql://localhost:5432/spring-ecommerce
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:mysql://localhost:3306/springEcommerce
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
-
 
 jwt:
   secret: MTdCGwG/ZMAngD7j6OMgy8Y+RiAhLQyukw1gmAMU8d0=
