@@ -7,6 +7,7 @@ public class ProductMapper {
 
     public static ProductResponseDTO toDTO(Product product){
         return ProductResponseDTO.builder()
+                .id(product.getId())
                 .color(product.getColor())
                 .price(product.getPrice())
                 .name(product.getName())
@@ -25,6 +26,7 @@ public class ProductMapper {
     public static Product toModel(ProductResponseDTO productResponseDTO){
         Product product = new Product();
 
+        product.setId(productResponseDTO.getId());
         product.setName(productResponseDTO.getName());
         product.setDescription(product.getDescription());
         product.setPrice(productResponseDTO.getPrice());

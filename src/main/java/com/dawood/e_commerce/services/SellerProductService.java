@@ -1,6 +1,7 @@
 package com.dawood.e_commerce.services;
 
 import com.dawood.e_commerce.dtos.request.ProductRequestDTO;
+import com.dawood.e_commerce.dtos.request.ProductUpdateRequestDTO;
 import com.dawood.e_commerce.dtos.response.ProductResponseDTO;
 import com.dawood.e_commerce.entities.Product;
 import com.dawood.e_commerce.entities.ProductCategory;
@@ -14,6 +15,8 @@ import com.dawood.e_commerce.repository.CategoryRepository;
 import com.dawood.e_commerce.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -40,9 +43,6 @@ public class SellerProductService {
             throw new SecurityException("Only seller can create a product");
         }
 
-        if (requestDTO.getCategory() == null || requestDTO.getCategory().isEmpty()) {
-            throw new IllegalArgumentException("Product must have at least one category");
-        }
 
         List<UUID> categoryIds = requestDTO.getCategory();
 
@@ -53,7 +53,7 @@ public class SellerProductService {
                 .description(requestDTO.getDescription())
                 .price(requestDTO.getPrice())
                 .name(requestDTO.getName())
-                .discount(requestDTO.getDiscount())
+                .discount(calculateDiscount(requestDTO.getMrpPrice(), requestDTO.getPrice()))
                 .inStock(requestDTO.getStockQuantity() > 0)
                 .images(requestDTO.getImages())
                 .mrpPrice(requestDTO.getMrpPrice())
@@ -63,8 +63,9 @@ public class SellerProductService {
                 .category(categories)
                 .status(ProductStatus.IN_STOCK)
                 .build();
-
-        return ProductMapper.toDTO(product);
+        
+    
+        return ProductMapper.toDTO(productRepository.save(product));
     }
 
     public void deleteProduct(UUID productId){
@@ -79,30 +80,69 @@ public class SellerProductService {
         return ProductMapper.toDTO(product);
     }
 
-    public ProductResponseDTO updateProduct(ProductRequestDTO requestDTO, UUID productId){
+    public ProductResponseDTO updateProduct(ProductUpdateRequestDTO requestDTO, UUID productId){
 
         SecurityContext ctx = SecurityContextHolder.getContext();
         String email = ctx.getAuthentication().getName();
 
-        User seller = userService.getUserByEmail(email, "Seller not found");
 
-        Product existingProduct = ProductMapper.toModel(getSingleProduct(productId));
+        User seller = userService.getUserByEmail(email, "User does not have a seller account");
+
+        Product existingProduct = productRepository.findById(productId)
+                .orElseThrow(()->new ProductNotFoundException());
+
+        System.out.println(existingProduct.getDescription());
 
         if(!seller.getUuid().equals(existingProduct.getSeller().getUuid())){
             throw new ProductException();
         }
 
-        return null;
+        List<ProductCategory> categories;
+
+        if(requestDTO.getCategory() != null){
+            categories=categoryRepository.findAllById(requestDTO.getCategory());
+        }else{
+            categories = existingProduct.getCategory();
+        }
+
+        existingProduct.setName(requestDTO.getName());
+        existingProduct.setDescription(requestDTO.getDescription());
+        existingProduct.setPrice(requestDTO.getPrice());
+        existingProduct.setMrpPrice(requestDTO.getMrpPrice());
+        existingProduct.setStockQuantity(requestDTO.getStockQuantity());
+        existingProduct.setStatus(requestDTO.getStatus());
+        existingProduct.setCategory(categories);
+        existingProduct.setSize(requestDTO.getSize());
+        existingProduct.setColor(requestDTO.getColor());
+        existingProduct.setImages(requestDTO.getImages());
+
+        return ProductMapper.toDTO(productRepository.save(existingProduct));
     }
 
-    public Page<ProductResponseDTO> getAllProducts(){
-        return  null;
+    public Page<ProductResponseDTO> getAllProducts(int pageSize, int pageNumber){
+
+        SecurityContext ctx = SecurityContextHolder.getContext();
+
+        String email = ctx.getAuthentication().getName();
+
+        User seller = userService.getUserByEmail(email, "Seller does not exists");
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        return productRepository.findAllBySellerOrderByCreatedAtDesc(seller,pageable)
+            .map(ProductMapper::toDTO);
     }
 
 
     private int calculateDiscount(long mrpPrice, long price){
-        int discount = (int) ((int) mrpPrice-price);
-        return (int) ((discount/mrpPrice)*100);
+
+        if(mrpPrice <=0) return 0;
+
+        double discount = mrpPrice-price;
+
+        double discountPercentage = ((discount/mrpPrice))*100;
+
+        return (int) Math.round(discountPercentage);
     }
 
 }

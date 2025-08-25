@@ -1,6 +1,7 @@
 package com.dawood.e_commerce.controllers;
 
 import com.dawood.e_commerce.dtos.request.ProductRequestDTO;
+import com.dawood.e_commerce.dtos.request.ProductUpdateRequestDTO;
 import com.dawood.e_commerce.dtos.request.SellerProfileDTO;
 import com.dawood.e_commerce.dtos.response.ProductResponseDTO;
 import com.dawood.e_commerce.dtos.response.SellerResponseDTO;
@@ -12,6 +13,8 @@ import com.dawood.e_commerce.services.SellerProductService;
 import com.dawood.e_commerce.services.SellerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -74,5 +77,16 @@ public class SellerController {
     @PostMapping("/create-product")
     public  ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO productRequestDTO){
         return new ResponseEntity<>(sellerProductService.createProduct(productRequestDTO),HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/update-product/{product-id}")
+    public ResponseEntity<ProductResponseDTO> updateProduct(@RequestBody ProductUpdateRequestDTO productRequestDTO, @PathVariable(name = "product-id") UUID productId){
+        return new ResponseEntity<>(sellerProductService.updateProduct(productRequestDTO, productId),HttpStatus.OK);
+    }
+
+    @GetMapping("/products")
+    public ResponseEntity<Page<ProductResponseDTO>> getAllProducts(@RequestParam(required = false, defaultValue = "0") int pageNumber,
+        @RequestParam(required = false, defaultValue = "20") int pageSize ){
+        return new ResponseEntity(sellerProductService.getAllProducts(pageSize,pageNumber),HttpStatus.OK);
     }
 }
