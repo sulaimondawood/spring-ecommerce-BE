@@ -2,6 +2,8 @@ package com.dawood.e_commerce.services;
 
 import com.dawood.e_commerce.dtos.request.ProductRequestDTO;
 import com.dawood.e_commerce.dtos.request.ProductUpdateRequestDTO;
+import com.dawood.e_commerce.dtos.response.EcommerceMeta;
+import com.dawood.e_commerce.dtos.response.ProductPaginationResponse;
 import com.dawood.e_commerce.dtos.response.ProductResponseDTO;
 import com.dawood.e_commerce.entities.Product;
 import com.dawood.e_commerce.entities.ProductCategory;
@@ -13,13 +15,9 @@ import com.dawood.e_commerce.exceptions.ProductNotFoundException;
 import com.dawood.e_commerce.mapper.ProductMapper;
 import com.dawood.e_commerce.repository.CategoryRepository;
 import com.dawood.e_commerce.repository.ProductRepository;
-import com.dawood.e_commerce.utils.ProductSpecification;
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -119,15 +117,8 @@ public class SellerProductService {
         return ProductMapper.toDTO(productRepository.save(existingProduct));
     }
 
-    public Page<ProductResponseDTO> getAllProducts(int pageSize,
-            int pageNumber,
-            UUID categoryId,
-            String name,
-            String description,
-            long minPrice,
-            long maxPrice,
-            ProductStatus status,
-            String size) {
+    public ProductPaginationResponse getAllProducts(int pageSize,
+            int pageNumber) {
 
         SecurityContext ctx = SecurityContextHolder.getContext();
 
@@ -137,8 +128,23 @@ public class SellerProductService {
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
-        return productRepository.findAllBySellerOrderByCreatedAtDesc(seller, pageable)
-                .map(ProductMapper::toDTO);
+        List<Product> pagedProduct = productRepository.findAllBySellerOrderByCreatedAtDesc(seller, pageable)
+                .getContent();
+
+        EcommerceMeta meta = EcommerceMeta
+                .builder()
+                .pageNumber(pageable.getPageNumber())
+                .pageSize(pageable.getPageSize())
+                .hasPrev(pageable.hasPrevious())
+                .build();
+
+        ProductPaginationResponse products = ProductPaginationResponse.builder()
+                .content(pagedProduct.stream().map(ProductMapper::toDTO).toList())
+                .meta(meta)
+                .build();
+
+        return products;
+
     }
 
     private int calculateDiscount(long mrpPrice, long price) {

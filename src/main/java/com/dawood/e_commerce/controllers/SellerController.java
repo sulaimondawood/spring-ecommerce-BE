@@ -3,6 +3,7 @@ package com.dawood.e_commerce.controllers;
 import com.dawood.e_commerce.dtos.request.ProductRequestDTO;
 import com.dawood.e_commerce.dtos.request.ProductUpdateRequestDTO;
 import com.dawood.e_commerce.dtos.request.SellerProfileDTO;
+import com.dawood.e_commerce.dtos.response.ProductPaginationResponse;
 import com.dawood.e_commerce.dtos.response.ProductResponseDTO;
 import com.dawood.e_commerce.dtos.response.SellerResponseDTO;
 import com.dawood.e_commerce.entities.BankDetails;
@@ -32,61 +33,64 @@ public class SellerController {
     private final SellerService sellerService;
     private final SellerProductService sellerProductService;
 
-
     @GetMapping
-    public ResponseEntity<List<SellerResponseDTO>> getSellers(){
+    public ResponseEntity<List<SellerResponseDTO>> getSellers() {
         return ResponseEntity.ok().body(sellerService.getAllSellers());
     }
 
     @GetMapping("/account")
-    public ResponseEntity<List<SellerResponseDTO>> getAllSellersByStatus(@RequestParam(name = "status", required = false) AccountStatus status){
+    public ResponseEntity<List<SellerResponseDTO>> getAllSellersByStatus(
+            @RequestParam(name = "status", required = false) AccountStatus status) {
         return ResponseEntity.ok(sellerService.getAllSellersByAccountStatus(status));
     }
 
     @GetMapping("/{sellerId}")
-    public ResponseEntity<SellerResponseDTO> getSellerById(@PathVariable UUID sellerId ){
+    public ResponseEntity<SellerResponseDTO> getSellerById(@PathVariable UUID sellerId) {
         return new ResponseEntity<>(sellerService.getSellerById(sellerId), HttpStatus.OK);
     }
 
     @PostMapping("/account/setup")
-    public ResponseEntity<Map<String,String>> setupSellerAccount(@Valid @RequestBody SellerProfileDTO request, @RequestHeader("Authorization") String jwt ){
+    public ResponseEntity<Map<String, String>> setupSellerAccount(@Valid @RequestBody SellerProfileDTO request,
+            @RequestHeader("Authorization") String jwt) {
 
         Map<String, String> response = new HashMap<>();
-        response.put("message","Account setup is successful");
+        response.put("message", "Account setup is successful");
 
         sellerService.setupSellerProfile(jwt, request);
 
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/account/profile")
-    public ResponseEntity<User> getSellerProfile(@RequestHeader("Authorization") String jwt){
-        return new ResponseEntity<>(sellerService.getSellerProfile(jwt),HttpStatus.OK);
+    public ResponseEntity<User> getSellerProfile(@RequestHeader("Authorization") String jwt) {
+        return new ResponseEntity<>(sellerService.getSellerProfile(jwt), HttpStatus.OK);
     }
 
     @PatchMapping("/account/bank")
-    public ResponseEntity<BankDetails> updateBankDetails(@Valid @RequestBody BankDetails request){
+    public ResponseEntity<BankDetails> updateBankDetails(@Valid @RequestBody BankDetails request) {
         return ResponseEntity.ok().body(sellerService.updateBankDetails(request));
     }
 
     @PatchMapping("/account/business-details")
-    public ResponseEntity<BusinessDetails> updateBusinessDetails(@RequestBody BusinessDetails request){
+    public ResponseEntity<BusinessDetails> updateBusinessDetails(@RequestBody BusinessDetails request) {
         return new ResponseEntity<>(sellerService.updateBusinessInfo(request), HttpStatus.OK);
     }
 
     @PostMapping("/create-product")
-    public  ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO productRequestDTO){
-        return new ResponseEntity<>(sellerProductService.createProduct(productRequestDTO),HttpStatus.CREATED);
+    public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO productRequestDTO) {
+        return new ResponseEntity<>(sellerProductService.createProduct(productRequestDTO), HttpStatus.CREATED);
     }
 
     @PatchMapping("/update-product/{product-id}")
-    public ResponseEntity<ProductResponseDTO> updateProduct(@RequestBody ProductUpdateRequestDTO productRequestDTO, @PathVariable(name = "product-id") UUID productId){
-        return new ResponseEntity<>(sellerProductService.updateProduct(productRequestDTO, productId),HttpStatus.OK);
+    public ResponseEntity<ProductResponseDTO> updateProduct(@RequestBody ProductUpdateRequestDTO productRequestDTO,
+            @PathVariable(name = "product-id") UUID productId) {
+        return new ResponseEntity<>(sellerProductService.updateProduct(productRequestDTO, productId), HttpStatus.OK);
     }
 
     @GetMapping("/products")
-    public ResponseEntity<Page<ProductResponseDTO>> getAllProducts(@RequestParam(required = false, defaultValue = "0") int pageNumber,
-        @RequestParam(required = false, defaultValue = "20") int pageSize ){
-        return new ResponseEntity(sellerProductService.getAllProducts(pageSize,pageNumber),HttpStatus.OK);
+    public ResponseEntity<ProductPaginationResponse> getAllProducts(
+            @RequestParam(required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(required = false, defaultValue = "20") int pageSize) {
+        return new ResponseEntity(sellerProductService.getAllProducts(pageSize, pageNumber), HttpStatus.OK);
     }
 }
