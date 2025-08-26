@@ -16,6 +16,8 @@ import com.dawood.e_commerce.mapper.ProductMapper;
 import com.dawood.e_commerce.repository.CategoryRepository;
 import com.dawood.e_commerce.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContext;
@@ -128,18 +130,19 @@ public class SellerProductService {
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
-        List<Product> pagedProduct = productRepository.findAllBySellerOrderByCreatedAtDesc(seller, pageable)
-                .getContent();
+        Page<Product> pagedProduct = productRepository.findAllBySellerOrderByCreatedAtDesc(seller, pageable);
 
         EcommerceMeta meta = EcommerceMeta
                 .builder()
-                .pageNumber(pageable.getPageNumber())
-                .pageSize(pageable.getPageSize())
-                .hasPrev(pageable.hasPrevious())
+                .pageNumber(pagedProduct.getNumber())
+                .pageSize(pagedProduct.getSize())
+                .totalPages(pagedProduct.getTotalPages())
+                .hasPrev(pagedProduct.hasPrevious())
+                .hasNext(pagedProduct.hasNext())
                 .build();
 
         ProductPaginationResponse products = ProductPaginationResponse.builder()
-                .content(pagedProduct.stream().map(ProductMapper::toDTO).toList())
+                .content(pagedProduct.getContent().stream().map(ProductMapper::toDTO).toList())
                 .meta(meta)
                 .build();
 
