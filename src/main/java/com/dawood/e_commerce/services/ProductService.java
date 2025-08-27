@@ -3,6 +3,8 @@ package com.dawood.e_commerce.services;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
+
+  private final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
   private final ProductRepository productRepository;
   private final CategoryRepository categoryRepository;
@@ -79,6 +83,38 @@ public class ProductService {
 
     return products;
 
+  }
+
+  public ProductPaginationResponse searchProduct(String searchQuery, int pageNumber, int pageSize) {
+    Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+    System.out.println(searchQuery);
+
+    Specification<Product> specification = ProductSpecification.containsDescription(searchQuery)
+        .or(ProductSpecification.containsName(searchQuery));
+
+    Page<Product> pagedProducts = productRepository.findAll(specification, pageable);
+
+    List<ProductResponseDTO> products = pagedProducts.getContent()
+        .stream()
+        .map(ProductMapper::toDTO)
+        .toList();
+
+    EcommerceMeta meta = EcommerceMeta
+        .builder()
+        .hasNext(pagedProducts.hasNext())
+        .hasPrev(pagedProducts.hasPrevious())
+        .pageNumber(pagedProducts.getNumber())
+        .pageSize(pagedProducts.getSize())
+        .totalPages(pagedProducts.getTotalPages())
+        .build();
+
+    ProductPaginationResponse response = ProductPaginationResponse.builder()
+        .content(products)
+        .meta(meta)
+        .build();
+
+    return response;
   }
 
 }
