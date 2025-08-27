@@ -27,11 +27,11 @@ public class CartItem {
 
     private int quantity = 1;
 
-    private int size;
+    private String size;
 
-    private int sellingPrice;
+    private long sellingPrice;
 
-    private int mrpPrice;
+    private long mrpPrice;
 
     @ManyToOne
     private Cart cart;

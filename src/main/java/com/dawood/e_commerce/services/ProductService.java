@@ -29,8 +29,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductService {
 
-  private final Logger logger = LoggerFactory.getLogger(ProductService.class);
-
   private final ProductRepository productRepository;
   private final CategoryRepository categoryRepository;
 
