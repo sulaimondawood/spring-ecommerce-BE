@@ -44,7 +44,7 @@ public class SellerOrder {
   @ManyToOne
   private MasterOrder order;
 
-  @OneToMany(mappedBy = "sellerOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference
   private List<OrderItem> orderItems;
 
