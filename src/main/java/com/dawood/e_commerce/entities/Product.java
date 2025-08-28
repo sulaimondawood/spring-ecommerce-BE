@@ -1,6 +1,8 @@
 package com.dawood.e_commerce.entities;
 
 import com.dawood.e_commerce.enums.ProductStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,7 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode
+
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class Product {
@@ -49,11 +51,7 @@ public class Product {
     private ProductStatus status;
 
     @ManyToMany
-    @JoinTable(
-            name = "product_category_mapping",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_category_id")
-    )
+    @JoinTable(name = "product_category_mapping", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "product_category_id"))
     private List<ProductCategory> category;
 
     private String size;
@@ -61,15 +59,18 @@ public class Product {
     private String color;
 
     @ManyToOne
+    @JsonIgnore
     private User seller;
 
     @ElementCollection
     private List<String> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<CartItem> cartItem;
 
     @OneToMany(mappedBy = "product")
+    @JsonIgnore
     private List<Review> reviews = new ArrayList<>();
 
     @CreatedDate

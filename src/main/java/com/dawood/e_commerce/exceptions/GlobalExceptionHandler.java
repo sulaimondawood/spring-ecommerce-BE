@@ -19,7 +19,17 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(SecurityException.class)
-    public ResponseEntity<ErrorDetails> securityExceptionHandler(SecurityException ex){
+    public ResponseEntity<ErrorDetails> securityExceptionHandler(SecurityException ex) {
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .error(ex.getMessage())
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.badRequest().body(errorDetails);
+    }
+
+    @ExceptionHandler(ProductException.class)
+    public ResponseEntity<ErrorDetails> productExceptionHandler(ProductException ex) {
         ErrorDetails errorDetails = ErrorDetails.builder()
                 .error(ex.getMessage())
                 .message(ex.getMessage())
@@ -29,7 +39,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ProductCategoryException.class)
-    public ResponseEntity<ErrorDetails> ProductCategoryHandler(ProductCategoryException ex){
+    public ResponseEntity<ErrorDetails> ProductCategoryHandler(ProductCategoryException ex) {
         ErrorDetails errorDetails = ErrorDetails.builder()
                 .error(ex.getMessage())
                 .message(ex.getMessage())
@@ -39,7 +49,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorDetails> methodArgumentTypeMismatcHandler(MethodArgumentTypeMismatchException ex){
+    public ResponseEntity<ErrorDetails> methodArgumentTypeMismatcHandler(MethodArgumentTypeMismatchException ex) {
         ErrorDetails errorDetails = ErrorDetails.builder()
                 .error("Invalid request parameter")
                 .message(ex.getMessage())
@@ -49,7 +59,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ErrorDetails> usernameNotFoundHandler(UsernameNotFoundException ex){
+    public ResponseEntity<ErrorDetails> usernameNotFoundHandler(UsernameNotFoundException ex) {
         ErrorDetails errorDetails = ErrorDetails.builder()
                 .message(ex.getMessage())
                 .code("BAD_CREDENTIALS")
@@ -59,7 +69,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorDetails> usernamePasswordHandler(BadCredentialsException ex){
+    public ResponseEntity<ErrorDetails> usernamePasswordHandler(BadCredentialsException ex) {
 
         ErrorDetails errorDetails = ErrorDetails.builder()
                 .message(ex.getMessage())
@@ -70,7 +80,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorDetails> userNotFoundHandler(UserNotFoundException ex){
+    public ResponseEntity<ErrorDetails> userNotFoundHandler(UserNotFoundException ex) {
 
         ErrorDetails errorDetails = new ErrorDetails();
         errorDetails.setCode("NOT_FOUND");
@@ -79,21 +89,21 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<Map<String,String>> userAlreadyExistsHandler(UserAlreadyExistsException ex){
+    public ResponseEntity<Map<String, String>> userAlreadyExistsHandler(UserAlreadyExistsException ex) {
         Map<String, String> response = new HashMap<>();
-        response.put("message", ex.getMessage() != null? ex.getMessage() : "User already exists");
+        response.put("message", ex.getMessage() != null ? ex.getMessage() : "User already exists");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorDetails> handleValidationError(MethodArgumentNotValidException ex){
+    public ResponseEntity<ErrorDetails> handleValidationError(MethodArgumentNotValidException ex) {
 
-        log.error("Validation Exception: {}",ex.getMessage());
+        log.error("Validation Exception: {}", ex.getMessage());
         Map<String, String> validationErrors = new HashMap<>();
 
         ex.getBindingResult().getFieldErrors()
-                .forEach((error)->{
-                    validationErrors.put(error.getField(),error.getDefaultMessage());
+                .forEach((error) -> {
+                    validationErrors.put(error.getField(), error.getDefaultMessage());
                 });
 
         ErrorDetails errorDetails = ErrorDetails.builder()
@@ -107,9 +117,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorDetails> handleGlobalException(Exception ex){
+    public ResponseEntity<ErrorDetails> handleGlobalException(Exception ex) {
 
-        log.error("Unexpected error occurred {}",ex.getMessage());
+        log.error("Unexpected error occurred {}", ex.getMessage());
 
         ErrorDetails error = ErrorDetails.builder()
                 .code("INTERNAL_SERVER_ERROR")

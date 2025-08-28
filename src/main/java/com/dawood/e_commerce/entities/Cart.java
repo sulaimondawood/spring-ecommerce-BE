@@ -6,18 +6,17 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class Cart {
@@ -27,7 +26,7 @@ public class Cart {
     private UUID id;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CartItem> cartItems = new HashSet<>();
+    private List<CartItem> cartItems = new ArrayList<>();
 
     private long totalPrice;
 
@@ -40,7 +39,7 @@ public class Cart {
     private String coupon;
 
     @OneToOne
-    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+    @JsonIgnore
     private User user;
 
     @CreatedDate

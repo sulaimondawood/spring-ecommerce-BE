@@ -6,6 +6,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -13,7 +15,6 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class CartItem {
@@ -34,6 +35,7 @@ public class CartItem {
     private long mrpPrice;
 
     @ManyToOne
+    @JsonIgnore
     private Cart cart;
 
     private UUID userId;
