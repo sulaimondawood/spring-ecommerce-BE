@@ -7,10 +7,13 @@ import com.dawood.e_commerce.dtos.request.CheckoutRequestDTO;
 import com.dawood.e_commerce.entities.Cart;
 import com.dawood.e_commerce.entities.MasterOrder;
 import com.dawood.e_commerce.entities.User;
+import com.dawood.e_commerce.enums.PaymentStatus;
+import com.dawood.e_commerce.exceptions.CartException;
 import com.dawood.e_commerce.exceptions.UserNotFoundException;
 import com.dawood.e_commerce.repository.MasterOrderRepository;
 import com.dawood.e_commerce.repository.SellerOrderRepository;
 import com.dawood.e_commerce.repository.UserRepository;
+import com.dawood.e_commerce.utils.OrderUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +25,19 @@ public class OrderService {
   private final UserRepository userRepository;
 
   public MasterOrder createOrder(CheckoutRequestDTO checkoutRequest) {
+
+    User user = getUser();
+
+    Cart userCart = user.getCart();
+
+    if (userCart == null) {
+      throw new CartException("Cart is empty");
+    }
+
+    MasterOrder masterOrder = new MasterOrder();
+    masterOrder.setCustomer(user);
+    masterOrder.setOrderId(OrderUtils.generateOrderNumber());
+    masterOrder.setPaymentStatus(PaymentStatus.PENDING);
 
     return null;
   }
