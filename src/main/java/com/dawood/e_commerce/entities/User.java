@@ -27,7 +27,7 @@ import java.util.UUID;
 public class User {
 
     @PrePersist
-    public void prePersit(){
+    public void prePersit() {
         this.isEmailVerified = false;
     }
 
@@ -69,6 +69,9 @@ public class User {
     @JsonIgnore
     private Cart cart;
 
+    @OneToMany(mappedBy = "customer")
+    @JsonIgnore
+    private List<MasterOrder> masterOrder;
 
     @CreatedDate
     private LocalDateTime createdAt;

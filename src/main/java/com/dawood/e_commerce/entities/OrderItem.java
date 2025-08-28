@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,8 +23,16 @@ public class OrderItem {
   private UUID id;
 
   @JsonBackReference
-  private Order order;
+  @ManyToOne
+  private MasterOrder masterOrder;
 
+  @JsonBackReference
+  @ManyToOne
+  private SellerOrder sellerOrder;
+
+  @ManyToOne
   private Product product;
+
+  private int quantity;
 
 }

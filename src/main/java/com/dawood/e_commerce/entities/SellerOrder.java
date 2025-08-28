@@ -26,42 +26,49 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Data
 @EntityListeners(AuditingEntityListener.class)
-public class MasterOrder {
+public class SellerOrder {
 
   @GeneratedValue
   @Id
   private UUID id;
 
-  private String orderId;
+  private String sellerOrderId;
 
   @ManyToOne
   private User customer;
 
-  @OneToMany(mappedBy = "")
-  @JsonManagedReference
-  private List<SellerOrder> sellerOrders;
+  @ManyToOne
+  private MasterOrder order;
 
-  @OneToMany(mappedBy = "masterOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "sellerOrder", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference
   private List<OrderItem> orderItems;
-
-  private long totalAmount;
-
-  private long shippingCost;
 
   @ManyToOne
   private Address shippingAddress;
 
-  // status
-  @Enumerated(EnumType.STRING)
-  private OrderStatus status;
-
   @Enumerated(EnumType.STRING)
   private PaymentStatus paymentStatus;
+
+  @Enumerated(EnumType.STRING)
+  private OrderStatus sellOrderStatus;
+
+  // tracking information
+  private String trackingCode;
+
+  private LocalDateTime estimatedDeliveryDate;
+
+  private LocalDateTime shippedAt;
+
+  private LocalDateTime deliveredAt;
+
+  private long subtotal;
+
+  private long shippingCost;
 
   @CreatedDate
   private LocalDateTime createdAt;
