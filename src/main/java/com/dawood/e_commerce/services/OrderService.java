@@ -1,0 +1,38 @@
+package com.dawood.e_commerce.services;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import com.dawood.e_commerce.dtos.request.CheckoutRequestDTO;
+import com.dawood.e_commerce.entities.Cart;
+import com.dawood.e_commerce.entities.MasterOrder;
+import com.dawood.e_commerce.entities.User;
+import com.dawood.e_commerce.exceptions.UserNotFoundException;
+import com.dawood.e_commerce.repository.MasterOrderRepository;
+import com.dawood.e_commerce.repository.SellerOrderRepository;
+import com.dawood.e_commerce.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class OrderService {
+  private final SellerOrderRepository sellerOrderRepository;
+  private final MasterOrderRepository masterOrderRepository;
+  private final UserRepository userRepository;
+
+  public MasterOrder createOrder(CheckoutRequestDTO checkoutRequest) {
+
+    return null;
+  }
+
+  private User getUser() {
+
+    String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+    return userRepository.findByEmail(email)
+        .orElseThrow(() -> new UserNotFoundException("User does not exists"));
+
+  }
+
+}
