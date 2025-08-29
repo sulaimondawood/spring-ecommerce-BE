@@ -21,6 +21,7 @@ import com.dawood.e_commerce.enums.OrderStatus;
 import com.dawood.e_commerce.enums.PaymentStatus;
 import com.dawood.e_commerce.exceptions.CartException;
 import com.dawood.e_commerce.exceptions.UserNotFoundException;
+import com.dawood.e_commerce.repository.AddressRepository;
 import com.dawood.e_commerce.repository.MasterOrderRepository;
 import com.dawood.e_commerce.repository.OrderItemRepository;
 import com.dawood.e_commerce.repository.SellerOrderRepository;
@@ -36,6 +37,7 @@ public class OrderService {
   private final MasterOrderRepository masterOrderRepository;
   private final UserRepository userRepository;
   private final OrderItemRepository orderItemRepository;
+  private final AddressRepository addressRepository;
 
   public MasterOrder createOrder(CheckoutRequestDTO checkoutRequest) {
 
@@ -53,6 +55,8 @@ public class OrderService {
       newAddress.setCity(checkoutRequest.getAddress().getCity());
       newAddress.setCountry(checkoutRequest.getAddress().getCountry());
       newAddress.setState(checkoutRequest.getAddress().getState());
+
+      addressRepository.save(newAddress);
     }
 
     MasterOrder masterOrder = new MasterOrder();
@@ -73,11 +77,12 @@ public class OrderService {
       List<CartItem> cartItems = entry.getValue();
 
       SellerOrder sellerOrder = new SellerOrder();
+      sellerOrder.setSellerOrderId(OrderUtils.generateOrderNumber());
       sellerOrder.setCustomer(user);
       sellerOrder.setOrder(masterOrder);
+      sellerOrder.setShippingAddress(checkoutRequest.getAddress());
       sellerOrder.setPaymentStatus(PaymentStatus.PENDING);
       sellerOrder.setSellOrderStatus(OrderStatus.PENDING);
-      sellerOrder.setSellerOrderId(OrderUtils.generateOrderNumber());
       sellerOrder.setTrackingCode(OrderUtils.gernerateTrackingCode());
 
       masterOrder.getSellerOrders().add(sellerOrder);
@@ -97,16 +102,18 @@ public class OrderService {
         orderItem.setSellingPrice(cartItem.getSellingPrice());
         orderItem.setMrpPrice(cartItem.getMrpPrice());
 
+        orderItem.getSellerOrder().getOrderItems().add(orderItem);
+
         orderItemRepository.save(orderItem);
 
       }
 
+      masterOrder.setTotalAmount(OrderUtils.calculateTotalAmount(sellerOrder.getOrderItems()));
       masterOrderRepository.save(masterOrder);
 
     }
 
-    MasterOrder.setTotalAmount(OrderUtils.calculateTotalAmount(cart));
-    return null;
+    return masterOrder;
   }
 
   private User getUser() {
