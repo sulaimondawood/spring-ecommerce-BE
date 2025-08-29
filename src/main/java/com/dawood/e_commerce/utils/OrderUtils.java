@@ -3,20 +3,38 @@ package com.dawood.e_commerce.utils;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import com.dawood.e_commerce.entities.OrderItem;
 
 public class OrderUtils {
-
-  private static String ORDER_PREFIX = "ORD";
-
   private static final SecureRandom random = new SecureRandom();
 
+  public static String gernerateTrackingCode() {
+
+    final String ALPHANUM = "ABCDEFGHIJKLMNOPQRSTUVWXWZ0123456789";
+    StringBuilder trackingCode = new StringBuilder();
+    for (int i = 0; i <= 8; i++) {
+      trackingCode.append(ALPHANUM.charAt(random.nextInt(ALPHANUM.length())));
+    }
+
+    return trackingCode.toString();
+
+  }
+
   public static String generateOrderNumber() {
+    final String ORDER_PREFIX = "ORD";
 
     DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     String timestamp = LocalDateTime.now().format(timeFormatter);
 
     return ORDER_PREFIX + "-" + timestamp + "-" + random.nextInt(999999);
+
+  }
+
+  public static long calculateTotalAmount(List<OrderItem> orderItems) {
+    return orderItems.stream().mapToLong(item -> item.getSellingPrice() * item.getQuantity()).sum();
 
   }
 

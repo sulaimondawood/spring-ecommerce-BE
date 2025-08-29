@@ -45,10 +45,6 @@ public class MasterOrder {
   @JsonManagedReference
   private List<SellerOrder> sellerOrders;
 
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-  @JsonManagedReference
-  private List<OrderItem> orderItems;
-
   private long totalAmount;
 
   private long shippingCost;

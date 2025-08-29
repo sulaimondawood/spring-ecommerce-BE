@@ -22,6 +22,12 @@ public class OrderItem {
   @Id
   private UUID id;
 
+  private String size;
+
+  private long sellingPrice;
+
+  private long mrpPrice;
+
   @JsonBackReference
   @ManyToOne
   private MasterOrder masterOrder;

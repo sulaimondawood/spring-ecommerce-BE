@@ -10,9 +10,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.dawood.e_commerce.dtos.request.CheckoutRequestDTO;
+import com.dawood.e_commerce.entities.Address;
 import com.dawood.e_commerce.entities.Cart;
 import com.dawood.e_commerce.entities.CartItem;
 import com.dawood.e_commerce.entities.MasterOrder;
+import com.dawood.e_commerce.entities.OrderItem;
 import com.dawood.e_commerce.entities.SellerOrder;
 import com.dawood.e_commerce.entities.User;
 import com.dawood.e_commerce.enums.OrderStatus;
@@ -20,6 +22,7 @@ import com.dawood.e_commerce.enums.PaymentStatus;
 import com.dawood.e_commerce.exceptions.CartException;
 import com.dawood.e_commerce.exceptions.UserNotFoundException;
 import com.dawood.e_commerce.repository.MasterOrderRepository;
+import com.dawood.e_commerce.repository.OrderItemRepository;
 import com.dawood.e_commerce.repository.SellerOrderRepository;
 import com.dawood.e_commerce.repository.UserRepository;
 import com.dawood.e_commerce.utils.OrderUtils;
@@ -32,6 +35,7 @@ public class OrderService {
   private final SellerOrderRepository sellerOrderRepository;
   private final MasterOrderRepository masterOrderRepository;
   private final UserRepository userRepository;
+  private final OrderItemRepository orderItemRepository;
 
   public MasterOrder createOrder(CheckoutRequestDTO checkoutRequest) {
 
@@ -43,11 +47,21 @@ public class OrderService {
       throw new CartException("Cart is empty");
     }
 
+    if (!user.getAddresses().contains(checkoutRequest.getAddress())) {
+      Address newAddress = new Address();
+      newAddress.setAddress(checkoutRequest.getAddress().getAddress());
+      newAddress.setCity(checkoutRequest.getAddress().getCity());
+      newAddress.setCountry(checkoutRequest.getAddress().getCountry());
+      newAddress.setState(checkoutRequest.getAddress().getState());
+    }
+
     MasterOrder masterOrder = new MasterOrder();
     masterOrder.setCustomer(user);
     masterOrder.setOrderId(OrderUtils.generateOrderNumber());
     masterOrder.setPaymentStatus(PaymentStatus.PENDING);
     masterOrder.setStatus(OrderStatus.PENDING);
+    masterOrder.setTotalAmount(OrderUtils.calculateTotalAmount(null));
+    masterOrder.setShippingAddress(checkoutRequest.getAddress());
 
     Map<UUID, List<CartItem>> groupVendorOrders = userCart
         .getCartItems()
@@ -56,10 +70,42 @@ public class OrderService {
 
     for (Map.Entry<UUID, List<CartItem>> entry : groupVendorOrders.entrySet()) {
 
+      List<CartItem> cartItems = entry.getValue();
+
       SellerOrder sellerOrder = new SellerOrder();
+      sellerOrder.setCustomer(user);
+      sellerOrder.setOrder(masterOrder);
+      sellerOrder.setPaymentStatus(PaymentStatus.PENDING);
+      sellerOrder.setSellOrderStatus(OrderStatus.PENDING);
+      sellerOrder.setSellerOrderId(OrderUtils.generateOrderNumber());
+      sellerOrder.setTrackingCode(OrderUtils.gernerateTrackingCode());
+
+      masterOrder.getSellerOrders().add(sellerOrder);
+
+      sellerOrderRepository.save(sellerOrder);
+
+      for (CartItem cartItem : cartItems) {
+
+        OrderItem orderItem = new OrderItem();
+
+        orderItem.setId(cartItem.getId());
+        orderItem.setMasterOrder(masterOrder);
+        orderItem.setProduct(cartItem.getProduct());
+        orderItem.setQuantity(cartItem.getQuantity());
+        orderItem.setSellerOrder(sellerOrder);
+        orderItem.setSize(cartItem.getSize());
+        orderItem.setSellingPrice(cartItem.getSellingPrice());
+        orderItem.setMrpPrice(cartItem.getMrpPrice());
+
+        orderItemRepository.save(orderItem);
+
+      }
+
+      masterOrderRepository.save(masterOrder);
 
     }
 
+    MasterOrder.setTotalAmount(OrderUtils.calculateTotalAmount(cart));
     return null;
   }
 
