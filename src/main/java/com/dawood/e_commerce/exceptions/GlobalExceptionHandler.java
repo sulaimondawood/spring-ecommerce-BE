@@ -18,6 +18,16 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ErrorDetails> orderNotFoundHandler(OrderNotFoundException ex) {
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .error(ex.getMessage())
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.badRequest().body(errorDetails);
+    }
+
     @ExceptionHandler(SecurityException.class)
     public ResponseEntity<ErrorDetails> securityExceptionHandler(SecurityException ex) {
         ErrorDetails errorDetails = ErrorDetails.builder()
