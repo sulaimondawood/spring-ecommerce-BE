@@ -7,7 +7,7 @@ import com.dawood.e_commerce.dtos.response.SignupResponse;
 import com.dawood.e_commerce.entities.Cart;
 import com.dawood.e_commerce.entities.User;
 import com.dawood.e_commerce.enums.UserRole;
-import com.dawood.e_commerce.exceptions.UserAlreadyExistsException;
+import com.dawood.e_commerce.exceptions.user.UserAlreadyExistsException;
 import com.dawood.e_commerce.mapper.UserMapper;
 import com.dawood.e_commerce.repository.CartRepository;
 import com.dawood.e_commerce.repository.UserRepository;
@@ -32,11 +32,11 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final CartRepository cartRepository;
     private final AuthenticationManager authenticationManager;
-    private  final JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
 
-    public SignupResponse createUser(SignupRequest request){
+    public SignupResponse createUser(SignupRequest request) {
 
-        if(userRepository.existsByEmail(request.getEmail())){
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new UserAlreadyExistsException();
         }
 
@@ -48,17 +48,18 @@ public class AuthService {
         user.setRole(request.getRole());
 
         Cart cart = new Cart();
-        Cart  userCart = cartRepository.save(cart);
+        Cart userCart = cartRepository.save(cart);
         user.setCart(userCart);
 
         return UserMapper.toSignupResponse(userRepository.save(user));
     }
 
-    public LoginResponse login(LoginRequest request){
+    public LoginResponse login(LoginRequest request) {
 
         try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(),
-                    request.getPassword()));
+            Authentication authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(),
+                            request.getPassword()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -68,7 +69,7 @@ public class AuthService {
 
             String role = authentication.getAuthorities()
                     .stream()
-                    .map(auth->auth.getAuthority())
+                    .map(auth -> auth.getAuthority())
                     .findFirst()
                     .orElse(UserRole.CUSTOMER.name());
 
@@ -78,11 +79,10 @@ public class AuthService {
             response.setRole(role);
 
             return response;
-        } catch (BadCredentialsException ex){
-            log.error("UsernamePasswordException Caught {}",ex.getMessage());
+        } catch (BadCredentialsException ex) {
+            log.error("UsernamePasswordException Caught {}", ex.getMessage());
             throw new BadCredentialsException("Username or password is incorrect");
         }
-
 
     }
 

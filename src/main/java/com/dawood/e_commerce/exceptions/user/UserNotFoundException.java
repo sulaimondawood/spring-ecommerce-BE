@@ -1,4 +1,6 @@
-package com.dawood.e_commerce.exceptions;
+package com.dawood.e_commerce.exceptions.user;
+
+import com.dawood.e_commerce.exceptions.EcommerceException; 
 
 public class UserNotFoundException extends EcommerceException{
     public UserNotFoundException() {
@@ -16,6 +18,7 @@ public class UserNotFoundException extends EcommerceException{
     public UserNotFoundException(Throwable cause) {
         super(cause);
     }
+            
 
     public UserNotFoundException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);

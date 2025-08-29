@@ -1,6 +1,11 @@
 package com.dawood.e_commerce.exceptions;
 
 import com.dawood.e_commerce.dtos.response.ErrorDetails;
+import com.dawood.e_commerce.exceptions.order.OrderException;
+import com.dawood.e_commerce.exceptions.order.OrderNotFoundException;
+import com.dawood.e_commerce.exceptions.user.UserAlreadyExistsException;
+import com.dawood.e_commerce.exceptions.user.UserNotFoundException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +22,16 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(OrderException.class)
+    public ResponseEntity<ErrorDetails> orderHandler(OrderException ex) {
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .error(ex.getMessage())
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.badRequest().body(errorDetails);
+    }
 
     @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<ErrorDetails> orderNotFoundHandler(OrderNotFoundException ex) {

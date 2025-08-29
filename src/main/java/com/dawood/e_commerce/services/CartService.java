@@ -12,7 +12,7 @@ import com.dawood.e_commerce.entities.CartItem;
 import com.dawood.e_commerce.entities.Product;
 import com.dawood.e_commerce.entities.User;
 import com.dawood.e_commerce.exceptions.ProductException;
-import com.dawood.e_commerce.exceptions.UserNotFoundException;
+import com.dawood.e_commerce.exceptions.user.UserNotFoundException;
 import com.dawood.e_commerce.repository.CartItemRepository;
 import com.dawood.e_commerce.repository.CartRepository;
 import com.dawood.e_commerce.repository.ProductRepository;

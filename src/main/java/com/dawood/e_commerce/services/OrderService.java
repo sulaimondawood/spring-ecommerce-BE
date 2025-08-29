@@ -20,8 +20,9 @@ import com.dawood.e_commerce.entities.User;
 import com.dawood.e_commerce.enums.OrderStatus;
 import com.dawood.e_commerce.enums.PaymentStatus;
 import com.dawood.e_commerce.exceptions.CartException;
-import com.dawood.e_commerce.exceptions.OrderNotFoundException;
-import com.dawood.e_commerce.exceptions.UserNotFoundException;
+import com.dawood.e_commerce.exceptions.order.OrderException;
+import com.dawood.e_commerce.exceptions.order.OrderNotFoundException;
+import com.dawood.e_commerce.exceptions.user.UserNotFoundException;
 import com.dawood.e_commerce.repository.AddressRepository;
 import com.dawood.e_commerce.repository.MasterOrderRepository;
 import com.dawood.e_commerce.repository.OrderItemRepository;
@@ -120,12 +121,12 @@ public class OrderService {
   public void cancelOrder(UUID orderId) {
 
     SellerOrder sellerOrder = sellerOrderRepository.findById(orderId)
-        .orElse(() -> new OrderNotFoundException("Order does not exist"));
+        .orElseThrow(() -> new OrderNotFoundException("Order does not exist"));
 
     User user = getUser();
 
-    if (orderId.equals(sellerOrder.getId())) {
-
+    if (!user.equals(sellerOrder.getCustomer())) {
+      throw new OrderException("Order belongs to a different user");
     }
 
   }

@@ -8,7 +8,7 @@ import com.dawood.e_commerce.entities.SellerProfile;
 import com.dawood.e_commerce.entities.User;
 import com.dawood.e_commerce.enums.AccountStatus;
 import com.dawood.e_commerce.enums.UserRole;
-import com.dawood.e_commerce.exceptions.UserNotFoundException;
+import com.dawood.e_commerce.exceptions.user.UserNotFoundException;
 import com.dawood.e_commerce.mapper.SellerMapper;
 import com.dawood.e_commerce.repository.UserRepository;
 import com.dawood.e_commerce.utils.JwtUtils;
@@ -32,39 +32,38 @@ public class SellerService {
     private final UserService userService;
     private final JwtUtils jwtUtils;
 
-
-    public List<SellerResponseDTO> getAllSellers(){
+    public List<SellerResponseDTO> getAllSellers() {
         return userRepository.findByRole(UserRole.SELLER).stream()
                 .map(SellerMapper::toDTO)
                 .toList();
     }
 
-    public List<SellerResponseDTO> getAllSellersByAccountStatus(AccountStatus status){
-        return  userRepository.findByAccountStatus(status).stream()
+    public List<SellerResponseDTO> getAllSellersByAccountStatus(AccountStatus status) {
+        return userRepository.findByAccountStatus(status).stream()
                 .map(SellerMapper::toDTO).collect(Collectors.toList());
     }
 
-    public SellerResponseDTO getSellerById(UUID id){
+    public SellerResponseDTO getSellerById(UUID id) {
         return userRepository.findById(id)
                 .map(SellerMapper::toDTO)
-                .orElseThrow(()->new UserNotFoundException("Seller account not found"));
+                .orElseThrow(() -> new UserNotFoundException("Seller account not found"));
     }
 
-    public User setupSellerProfile(String jwt, SellerProfileDTO request){
+    public User setupSellerProfile(String jwt, SellerProfileDTO request) {
 
-        Object principal  = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         UserDetails userDetails = (UserDetails) principal;
 
         UserRole userRole = userDetails.getAuthorities()
                 .stream()
                 .findFirst()
-                .map(role->UserRole.valueOf(role.getAuthority()))
+                .map(role -> UserRole.valueOf(role.getAuthority()))
                 .orElse(UserRole.CUSTOMER);
 
         User seller = userService.getUserByEmailAndRole(jwt, userRole);
 
-        SellerProfile sellerProfile =new SellerProfile();
+        SellerProfile sellerProfile = new SellerProfile();
 
         BankDetails bankDetails = new BankDetails();
         bankDetails.setBankName(request.getBankDetails().getBankName());
@@ -85,20 +84,18 @@ public class SellerService {
         sellerProfile.setSeller(seller);
         seller.setSellerProfile(sellerProfile);
 
-
         return userRepository.save(seller);
     }
 
-
-    public User getSellerProfile(String jwt){
+    public User getSellerProfile(String jwt) {
         String token = jwtUtils.extractTokenFromHeader(jwt);
         String email = jwtUtils.extractUsername(token);
 
         return userRepository.findByEmail(email)
-                .orElseThrow(()->new UserNotFoundException());
+                .orElseThrow(() -> new UserNotFoundException());
     }
 
-    public BankDetails updateBankDetails(BankDetails bankDetailsDTO){
+    public BankDetails updateBankDetails(BankDetails bankDetailsDTO) {
 
         SecurityContext context = SecurityContextHolder.getContext();
 
@@ -108,20 +105,19 @@ public class SellerService {
         log.info("EMail from seller service");
 
         User seller = userRepository.findByEmail(email)
-                .orElseThrow(()->new UserNotFoundException());
+                .orElseThrow(() -> new UserNotFoundException());
 
-
-        if(seller.getSellerProfile() == null){
+        if (seller.getSellerProfile() == null) {
             throw new IllegalStateException("Seller profile not found, please create a profile first");
         }
 
         BankDetails bankDetails = seller.getSellerProfile().getBankDetails();
 
-        if(bankDetails == null){
+        if (bankDetails == null) {
             bankDetails = new BankDetails();
         }
 
-        if(bankDetailsDTO.getBankName() != null && !bankDetailsDTO.getBankName().isBlank()){
+        if (bankDetailsDTO.getBankName() != null && !bankDetailsDTO.getBankName().isBlank()) {
             bankDetails.setBankName(bankDetailsDTO.getBankName());
         }
 
@@ -129,12 +125,11 @@ public class SellerService {
             bankDetails.setAccountNumber(bankDetailsDTO.getAccountNumber());
         }
 
-        if(bankDetailsDTO.getAccountHolderName() != null && !bankDetailsDTO.getAccountHolderName().isBlank()){
+        if (bankDetailsDTO.getAccountHolderName() != null && !bankDetailsDTO.getAccountHolderName().isBlank()) {
             bankDetails.setAccountHolderName(bankDetailsDTO.getAccountHolderName());
         }
 
-        seller.getSellerProfile().
-        setBankDetails(bankDetails);
+        seller.getSellerProfile().setBankDetails(bankDetails);
 
         userRepository.save(seller);
 
@@ -142,44 +137,47 @@ public class SellerService {
 
     }
 
-    public BusinessDetails updateBusinessInfo(BusinessDetails businessDetailsRequest){
+    public BusinessDetails updateBusinessInfo(BusinessDetails businessDetailsRequest) {
 
         SecurityContext context = SecurityContextHolder.getContext();
         String username = context.getAuthentication().getName();
 
         User seller = userService.getUserByEmail(username);
 
-        if(seller.getSellerProfile() == null){
+        if (seller.getSellerProfile() == null) {
             throw new IllegalStateException("Seller profile not found, please create a profile first");
         }
 
         BusinessDetails businessDetails = seller.getSellerProfile().getBusinessDetails();
 
-        if(businessDetails == null){
+        if (businessDetails == null) {
             businessDetails = new BusinessDetails();
         }
 
-        if(businessDetailsRequest.getBusinessBanner() != null && !businessDetailsRequest.getBusinessBanner().isBlank()){
+        if (businessDetailsRequest.getBusinessBanner() != null
+                && !businessDetailsRequest.getBusinessBanner().isBlank()) {
             businessDetails.setBusinessBanner(businessDetailsRequest.getBusinessBanner());
         }
 
-        if(businessDetailsRequest.getBusinessEmail() != null && !businessDetailsRequest.getBusinessEmail().isBlank()){
+        if (businessDetailsRequest.getBusinessEmail() != null && !businessDetailsRequest.getBusinessEmail().isBlank()) {
             businessDetails.setBusinessEmail(businessDetailsRequest.getBusinessEmail());
         }
 
-        if(businessDetailsRequest.getBusinessName() != null && !businessDetailsRequest.getBusinessName().isBlank()){
+        if (businessDetailsRequest.getBusinessName() != null && !businessDetailsRequest.getBusinessName().isBlank()) {
             businessDetails.setBusinessName(businessDetailsRequest.getBusinessName());
         }
 
-        if(businessDetailsRequest.getBusinessNumber() != null && !businessDetailsRequest.getBusinessNumber().isBlank()){
+        if (businessDetailsRequest.getBusinessNumber() != null
+                && !businessDetailsRequest.getBusinessNumber().isBlank()) {
             businessDetails.setBusinessNumber(businessDetailsRequest.getBusinessNumber());
         }
 
-        if(businessDetailsRequest.getBusinessImage() != null && !businessDetailsRequest.getBusinessImage().isBlank()){
+        if (businessDetailsRequest.getBusinessImage() != null && !businessDetailsRequest.getBusinessImage().isBlank()) {
             businessDetails.setBusinessImage(businessDetailsRequest.getBusinessImage());
         }
 
-        if(businessDetailsRequest.getBusinessAddress() != null && !businessDetailsRequest.getBusinessAddress().isBlank()){
+        if (businessDetailsRequest.getBusinessAddress() != null
+                && !businessDetailsRequest.getBusinessAddress().isBlank()) {
             businessDetails.setBusinessAddress(businessDetailsRequest.getBusinessAddress());
         }
 
@@ -187,7 +185,7 @@ public class SellerService {
 
         userRepository.save(seller);
 
-        return  businessDetails;
+        return businessDetails;
     }
 
 }

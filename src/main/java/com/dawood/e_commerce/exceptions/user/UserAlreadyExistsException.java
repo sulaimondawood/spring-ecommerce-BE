@@ -1,5 +1,7 @@
-package com.dawood.e_commerce.exceptions;
+package com.dawood.e_commerce.exceptions.user;
 
+import com.dawood.e_commerce.exceptions.EcommerceException;
+ 
 public class UserAlreadyExistsException extends EcommerceException {
     public UserAlreadyExistsException(){
 
