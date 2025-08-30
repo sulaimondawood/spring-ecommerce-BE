@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,12 +28,16 @@ public class Address {
     @GeneratedValue
     private UUID id;
 
+    @NotBlank(message = "Address field is required")
     private String address;
 
+    @NotBlank(message = "Country field is required")
     private String country;
 
+    @NotBlank(message = "City field is required")
     private String city;
 
+    @NotBlank(message = "State field is required")
     private String state;
 
     @CreatedDate

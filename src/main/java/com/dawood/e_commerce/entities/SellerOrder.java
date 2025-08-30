@@ -1,6 +1,7 @@
 package com.dawood.e_commerce.entities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.dawood.e_commerce.enums.OrderStatus;
 import com.dawood.e_commerce.enums.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
@@ -43,11 +45,12 @@ public class SellerOrder {
   private User customer;
 
   @ManyToOne
+  @JsonBackReference
   private MasterOrder order;
 
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "sellerOrder")
   @JsonManagedReference
-  private List<OrderItem> orderItems;
+  private List<OrderItem> orderItems = new ArrayList<>();
 
   @ManyToOne
   private Address shippingAddress;

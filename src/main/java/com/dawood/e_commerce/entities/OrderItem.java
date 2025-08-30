@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -33,7 +34,7 @@ public class OrderItem {
   private MasterOrder masterOrder;
 
   @JsonBackReference
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.ALL)
   private SellerOrder sellerOrder;
 
   @ManyToOne

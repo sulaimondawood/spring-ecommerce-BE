@@ -1,6 +1,7 @@
 package com.dawood.e_commerce.entities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,9 +42,9 @@ public class MasterOrder {
   @ManyToOne
   private User customer;
 
-  @OneToMany(mappedBy = "")
+  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonManagedReference
-  private List<SellerOrder> sellerOrders;
+  private List<SellerOrder> sellerOrders = new ArrayList<>();
 
   private long totalAmount;
 
