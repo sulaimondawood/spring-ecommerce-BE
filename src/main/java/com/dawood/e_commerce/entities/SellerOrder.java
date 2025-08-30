@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.dawood.e_commerce.enums.OrderStatus;
 import com.dawood.e_commerce.enums.PaymentStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
@@ -42,6 +43,7 @@ public class SellerOrder {
   private String sellerOrderId;
 
   @ManyToOne
+  @JsonIgnore
   private User customer;
 
   @ManyToOne

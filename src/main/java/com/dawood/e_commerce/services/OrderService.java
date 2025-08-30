@@ -7,11 +7,17 @@ import java.util.UUID;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dawood.e_commerce.dtos.request.CheckoutRequestDTO;
+import com.dawood.e_commerce.dtos.response.EcommerceMeta;
+import com.dawood.e_commerce.dtos.response.order.MasterOrderPagedResponse;
 import com.dawood.e_commerce.entities.Address;
 import com.dawood.e_commerce.entities.Cart;
 import com.dawood.e_commerce.entities.CartItem;
@@ -31,6 +37,7 @@ import com.dawood.e_commerce.repository.MasterOrderRepository;
 import com.dawood.e_commerce.repository.OrderItemRepository;
 import com.dawood.e_commerce.repository.SellerOrderRepository;
 import com.dawood.e_commerce.repository.UserRepository;
+import com.dawood.e_commerce.utils.OrderSpecification;
 import com.dawood.e_commerce.utils.OrderUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -46,8 +53,6 @@ public class OrderService {
 
   @Transactional
   public MasterOrder createOrder(CheckoutRequestDTO checkoutRequest) {
-    // Print city for debugging (remove in production)
-    System.out.println(checkoutRequest.getAddress().getCity());
 
     // Get authenticated user
     User user = getUser();
@@ -58,7 +63,6 @@ public class OrderService {
       throw new CartException("Cart is empty");
     }
 
-    // Convert AddressDTO to Address entity
     Address address = new Address();
     address.setAddress(checkoutRequest.getAddress().getAddress());
     address.setCountry(checkoutRequest.getAddress().getCountry());
@@ -74,7 +78,6 @@ public class OrderService {
             checkoutRequest.getAddress().getState())
         .orElseGet(() -> addressRepository.save(address));
 
-    // Associate address with user (avoid duplicate entries in users_addresses)
     if (!user.getAddresses().contains(existingAddress)) {
       user.getAddresses().add(existingAddress);
       userRepository.save(user);
@@ -140,94 +143,6 @@ public class OrderService {
     // Save and return MasterOrder
     return masterOrderRepository.save(masterOrder);
   }
-  // public MasterOrder createOrder(CheckoutRequestDTO checkoutRequest) {
-
-  // System.out.println(checkoutRequest.getAddress().getCity());
-
-  // User user = getUser();
-
-  // Cart userCart = user.getCart();
-
-  // if (userCart == null) {
-  // throw new CartException("Cart is empty");
-  // }
-
-  // Address existingAddress = addressRepository
-  // .findByAddressAndCountryAndCityAndState(checkoutRequest.getAddress().getAddress(),
-  // checkoutRequest.getAddress().getCountry(),
-  // checkoutRequest.getAddress().getCity(),
-  // checkoutRequest.getAddress().getState())
-  // .orElseGet(
-  // () -> addressRepository.save(checkoutRequest.getAddress()));
-
-  // if (!user.getAddresses().contains(existingAddress)) {
-  // user.getAddresses().add(existingAddress);
-  // userRepository.save(user); // Updates users_addresses
-  // }
-
-  // MasterOrder masterOrder = new MasterOrder();
-  // masterOrder.setCustomer(user);
-  // masterOrder.setOrderId(OrderUtils.generateOrderNumber());
-  // masterOrder.setPaymentStatus(PaymentStatus.PENDING);
-  // masterOrder.setStatus(OrderStatus.PENDING);
-  // masterOrder.setShippingAddress(existingAddress);
-
-  // long totalAmount = 0;
-
-  // Map<UUID, List<CartItem>> groupVendorOrders = userCart
-  // .getCartItems()
-  // .stream()
-  // .collect(Collectors.groupingBy(cartItem ->
-  // cartItem.getProduct().getSeller().getUuid()));
-
-  // for (Map.Entry<UUID, List<CartItem>> entry : groupVendorOrders.entrySet()) {
-
-  // List<CartItem> cartItems = entry.getValue();
-
-  // SellerOrder sellerOrder = new SellerOrder();
-  // sellerOrder.setSellerOrderId(OrderUtils.generateOrderNumber());
-  // sellerOrder.setCustomer(user);
-  // sellerOrder.setOrder(masterOrder);
-  // sellerOrder.setShippingAddress(checkoutRequest.getAddress());
-  // sellerOrder.setPaymentStatus(PaymentStatus.PENDING);
-  // sellerOrder.setSellOrderStatus(OrderStatus.PENDING);
-  // sellerOrder.setTrackingCode(OrderUtils.gernerateTrackingCode());
-
-  // for (CartItem cartItem : cartItems) {
-
-  // OrderItem orderItem = new OrderItem();
-
-  // orderItem.setMasterOrder(masterOrder);
-  // orderItem.setProduct(cartItem.getProduct());
-  // orderItem.setQuantity(cartItem.getQuantity());
-  // orderItem.setSellerOrder(sellerOrder);
-  // orderItem.setSize(cartItem.getSize());
-  // orderItem.setSellingPrice(cartItem.getSellingPrice());
-  // orderItem.setMrpPrice(cartItem.getMrpPrice());
-  // orderItem.getSellerOrder().getOrderItems().add(orderItem);
-
-  // sellerOrder.getOrderItems().add(orderItem);
-  // totalAmount += cartItem.getSellingPrice() * cartItem.getQuantity();
-  // sellerOrderRepository.save(sellerOrder);
-  // orderItemRepository.save(orderItem);
-  // masterOrder.getSellerOrders().add(sellerOrder);
-
-  // }
-
-  // // Save SellerOrder and its OrderItems
-  // sellerOrderRepository.save(sellerOrder);
-  // for (OrderItem orderItem : sellerOrder.getOrderItems()) {
-  // orderItemRepository.save(orderItem);
-  // }
-
-  // }
-  // // masterOrder.getSellerOrders(se);
-  // masterOrder.setTotalAmount(totalAmount);
-
-  // // Payment service here
-  // return masterOrderRepository.save(masterOrder);
-
-  // }
 
   public void cancelOrder(UUID orderId) {
 
@@ -253,7 +168,7 @@ public class OrderService {
     masterOrderRepository.save(masterOrder);
 
     // Payment functionality here
-    // Refund Sevice
+    // Refund Service here
 
   }
 
@@ -291,4 +206,31 @@ public class OrderService {
 
   }
 
+  public MasterOrderPagedResponse getAllMasterOrders(int pageNo, int pageSize, String query) {
+
+    Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+    Specification<MasterOrder> spec = OrderSpecification.hasOrderId(query);
+
+    Page<MasterOrder> pagedMasterOrder = masterOrderRepository.findAll(spec, pageable);
+
+    List<MasterOrder> content = pagedMasterOrder.getContent();
+
+    EcommerceMeta meta = new EcommerceMeta();
+    meta.setHasNext(pagedMasterOrder.hasNext());
+    meta.setHasPrev(pagedMasterOrder.hasPrevious());
+    meta.setPageNumber(pagedMasterOrder.getNumber());
+    meta.setPageSize(pagedMasterOrder.getSize());
+    meta.setTotalPages(pagedMasterOrder.getTotalPages());
+
+    MasterOrderPagedResponse response = new MasterOrderPagedResponse();
+    response.setOrders(content);
+    response.setMeta(meta);
+
+    return response;
+  }
+
+  public List<SellerOrder> getAllSellerOders() {
+    return sellerOrderRepository.findAll();
+  }
 }
