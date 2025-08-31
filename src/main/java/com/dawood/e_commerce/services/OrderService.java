@@ -233,4 +233,30 @@ public class OrderService {
   public List<SellerOrder> getAllSellerOders() {
     return sellerOrderRepository.findAll();
   }
+
+  public MasterOrderPagedResponse customerHistory(int pageNo, int pageSize, String query) {
+
+    User user = getUser();
+
+    Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+    Specification<MasterOrder> spec = OrderSpecification.hasCustomerId(user.getUuid());
+
+    Page<MasterOrder> pagedMasterOrder = masterOrderRepository.findAll(spec, pageable);
+
+    List<MasterOrder> content = pagedMasterOrder.getContent();
+
+    EcommerceMeta meta = new EcommerceMeta();
+    meta.setHasNext(pagedMasterOrder.hasNext());
+    meta.setHasPrev(pagedMasterOrder.hasPrevious());
+    meta.setPageNumber(pagedMasterOrder.getNumber());
+    meta.setPageSize(pagedMasterOrder.getSize());
+    meta.setTotalPages(pagedMasterOrder.getTotalPages());
+
+    MasterOrderPagedResponse response = new MasterOrderPagedResponse();
+    response.setOrders(content);
+    response.setMeta(meta);
+
+    return response;
+  }
 }

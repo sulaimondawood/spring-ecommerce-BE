@@ -13,6 +13,6 @@ import com.dawood.e_commerce.entities.MasterOrder;
 @Repository
 public interface MasterOrderRepository extends JpaRepository<MasterOrder, UUID>, JpaSpecificationExecutor<MasterOrder> {
 
-  Page<MasterOrder> findAll(Pageable pageable);
+  Page<MasterOrder> findAllByCustomerUuid(UUID customerId, Pageable pageable);
 
 }
