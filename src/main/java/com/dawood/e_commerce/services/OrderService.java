@@ -230,10 +230,6 @@ public class OrderService {
     return response;
   }
 
-  public List<SellerOrder> getAllSellerOders() {
-    return sellerOrderRepository.findAll();
-  }
-
   public MasterOrderPagedResponse customerHistory(int pageNo, int pageSize, String query) {
 
     User user = getUser();

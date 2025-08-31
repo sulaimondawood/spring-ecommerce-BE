@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.dawood.e_commerce.entities.MasterOrder;
+import com.dawood.e_commerce.entities.SellerOrder;
 
 public class OrderSpecification {
 
@@ -14,6 +15,15 @@ public class OrderSpecification {
         return criteriaBuilder.conjunction();
       }
       return criteriaBuilder.equal(root.get("orderId"), orderId);
+    };
+  }
+
+  public static Specification<SellerOrder> hasSellerOrderId(String orderId) {
+    return (root, query, criteriaBuilder) -> {
+      if (orderId == null) {
+        return criteriaBuilder.conjunction();
+      }
+      return criteriaBuilder.equal(root.get("sellerOrderId"), orderId);
     };
   }
 
