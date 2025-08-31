@@ -122,7 +122,7 @@ public class SellerOrderService {
     MasterOrder masterOrder = masterOrderRepository.findById(orderId)
         .orElseThrow(() -> new OrderNotFoundException("Order does not exist"));
 
-    if (!OrderUtils.isValidOrderStatusTransition(sellerOrder.getSellOrderStatus(), status)) {
+    if (!OrderUtils.isValidOrderStatusTransition(sellerOrder.getSellOrderStatus(), OrderStatus.CANCELLED)) {
       throw new InvalidOrderTransitionException("Order status cannot be changed");
     }
 

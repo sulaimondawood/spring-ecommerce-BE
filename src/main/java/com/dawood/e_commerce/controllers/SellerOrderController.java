@@ -20,13 +20,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/seller/orders")
+@RequestMapping("/seller")
 @RequiredArgsConstructor
 public class SellerOrderController {
 
   private final SellerOrderService sellerOrderService;
 
-  @GetMapping
+  @GetMapping("/orders")
   public ResponseEntity<SellerOrderPagedResponse> getAllSellersOrders(
       @RequestParam(defaultValue = "0", required = false) int pageNo,
       @RequestParam(defaultValue = "20", required = false) int pageSize,
@@ -34,7 +34,7 @@ public class SellerOrderController {
     return new ResponseEntity<>(sellerOrderService.getAllSellerOrders(pageNo, pageSize, query), HttpStatus.OK);
   }
 
-  @GetMapping
+  @GetMapping("/orders/history")
   public ResponseEntity<SellerOrderPagedResponse> getSellerHistory(
       @RequestParam(defaultValue = "0", required = false) int pageNo,
       @RequestParam(defaultValue = "20", required = false) int pageSize,
@@ -42,12 +42,12 @@ public class SellerOrderController {
     return new ResponseEntity<>(sellerOrderService.getSellerHistory(pageNo, pageSize, query), HttpStatus.OK);
   }
 
-  @GetMapping("/{orderId}")
+  @GetMapping("/{orderId}/order")
   public ResponseEntity<SellerOrder> getSellerOrderById(@PathVariable UUID orderId) {
     return ResponseEntity.ok(sellerOrderService.getSellerOrderById(orderId));
   }
 
-  @PatchMapping("/{orderId}")
+  @PatchMapping("/{orderId}/update")
   public ResponseEntity<SellerOrder> updateSellerOrder(@PathVariable UUID orderId,
       @RequestBody @Valid UpdateOrderRequest request) {
     return ResponseEntity.ok(sellerOrderService.updateSellerOrder(orderId, request.getStatus()));

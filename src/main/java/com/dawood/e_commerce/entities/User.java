@@ -74,6 +74,10 @@ public class User {
     @JsonIgnore
     private List<MasterOrder> masterOrder;
 
+    @OneToOne(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private SellerReport sellerReport;
+
     @CreatedDate
     private LocalDateTime createdAt;
 

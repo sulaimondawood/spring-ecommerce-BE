@@ -23,6 +23,16 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<ErrorDetails> securityrHandler(SecurityException ex) {
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .error(ex.getMessage())
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.badRequest().body(errorDetails);
+    }
+
     @ExceptionHandler(OrderException.class)
     public ResponseEntity<ErrorDetails> orderHandler(OrderException ex) {
         ErrorDetails errorDetails = ErrorDetails.builder()

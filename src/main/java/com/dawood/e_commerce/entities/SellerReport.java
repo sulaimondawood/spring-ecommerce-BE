@@ -5,6 +5,7 @@ import java.util.UUID;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,9 @@ public class SellerReport {
   @Id
   @GeneratedValue
   private UUID id;
+
+  @OneToOne
+  private User seller;
 
   private int totalOrders;
 
