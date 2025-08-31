@@ -11,7 +11,7 @@ public class OrderSpecification {
 
   public static Specification<MasterOrder> hasOrderId(String orderId) {
     return (root, query, criteriaBuilder) -> {
-      if (orderId == null) {
+      if (orderId == null || orderId.isEmpty()) {
         return criteriaBuilder.conjunction();
       }
       return criteriaBuilder.equal(root.get("orderId"), orderId);
@@ -20,10 +20,19 @@ public class OrderSpecification {
 
   public static Specification<SellerOrder> hasSellerOrderId(String orderId) {
     return (root, query, criteriaBuilder) -> {
-      if (orderId == null) {
+      if (orderId == null || orderId.isEmpty()) {
         return criteriaBuilder.conjunction();
       }
       return criteriaBuilder.equal(root.get("sellerOrderId"), orderId);
+    };
+  }
+
+  public static Specification<SellerOrder> hasSellerId(UUID sellerId) {
+    return (root, query, criteriaBuilder) -> {
+      if (sellerId == null) {
+        return criteriaBuilder.conjunction();
+      }
+      return criteriaBuilder.equal(root.get("sellerId"), sellerId);
     };
   }
 

@@ -46,6 +46,8 @@ public class SellerOrder {
   @JsonIgnore
   private User customer;
 
+  private UUID sellerId;
+
   @ManyToOne
   @JsonBackReference
   private MasterOrder order;

@@ -122,6 +122,7 @@ public class OrderService {
         orderItem.setSellingPrice(cartItem.getSellingPrice());
         orderItem.setMrpPrice(cartItem.getMrpPrice());
 
+        sellerOrder.setSellerId(cartItem.getProduct().getSeller().getUuid());
         sellerOrder.getOrderItems().add(orderItem);
         masterOrder.getSellerOrders().add(sellerOrder);
 
