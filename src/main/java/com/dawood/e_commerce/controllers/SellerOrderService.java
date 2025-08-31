@@ -9,11 +9,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dawood.e_commerce.dtos.response.EcommerceMeta;
 import com.dawood.e_commerce.dtos.response.order.SellerOrderPagedResponse;
 import com.dawood.e_commerce.entities.MasterOrder;
 import com.dawood.e_commerce.entities.SellerOrder;
+import com.dawood.e_commerce.entities.SellerReport;
 import com.dawood.e_commerce.entities.User;
 import com.dawood.e_commerce.enums.OrderStatus;
 import com.dawood.e_commerce.exceptions.order.InvalidOrderTransitionException;
@@ -21,7 +23,9 @@ import com.dawood.e_commerce.exceptions.order.OrderNotFoundException;
 import com.dawood.e_commerce.exceptions.user.UserNotFoundException;
 import com.dawood.e_commerce.repository.MasterOrderRepository;
 import com.dawood.e_commerce.repository.SellerOrderRepository;
+import com.dawood.e_commerce.repository.SellerReportRepository;
 import com.dawood.e_commerce.repository.UserRepository;
+import com.dawood.e_commerce.services.SellerReportService;
 import com.dawood.e_commerce.utils.OrderSpecification;
 import com.dawood.e_commerce.utils.OrderUtils;
 
@@ -34,6 +38,8 @@ public class SellerOrderService {
   private final SellerOrderRepository sellerOrderRepository;
   private final UserRepository userRepository;
   private final MasterOrderRepository masterOrderRepository;
+  private final SellerReportService sellerReportService;
+  private final SellerReportRepository sellerReportRepository;
 
   public SellerOrderPagedResponse getAllSellerOrders(
       int pageNo, int pageSize, String query) {
@@ -63,6 +69,7 @@ public class SellerOrderService {
         .orElseThrow(() -> new OrderNotFoundException("Order not found"));
   }
 
+  @Transactional
   public SellerOrder updateSellerOrder(UUID orderId, OrderStatus status) {
 
     User currentUser = getUser();
@@ -114,13 +121,13 @@ public class SellerOrderService {
     return response;
   }
 
+  @Transactional
   public SellerOrder cancelSellerOrder(UUID orderId) {
 
     User currentUser = getUser();
     SellerOrder sellerOrder = getSellerOrderById(orderId);
 
-    MasterOrder masterOrder = masterOrderRepository.findById(orderId)
-        .orElseThrow(() -> new OrderNotFoundException("Order does not exist"));
+    MasterOrder masterOrder = sellerOrder.getOrder();
 
     if (!OrderUtils.isValidOrderStatusTransition(sellerOrder.getSellOrderStatus(), OrderStatus.CANCELLED)) {
       throw new InvalidOrderTransitionException("Order status cannot be changed");
@@ -135,6 +142,18 @@ public class SellerOrderService {
 
     sellerOrderRepository.save(sellerOrder);
     masterOrderRepository.save(masterOrder);
+
+    SellerReport sr = sellerReportService.getSellerReport();
+
+    if (sr == null) {
+      sr = new SellerReport();
+      sr.setCancelledOrders(1);
+      sr.setSeller(currentUser);
+    }
+
+    sr.setCancelledOrders(sr.getCancelledOrders() + 1);
+
+    sellerReportRepository.save(sr);
 
     return sellerOrder;
 
