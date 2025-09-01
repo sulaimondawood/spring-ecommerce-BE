@@ -19,7 +19,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class Product {
@@ -72,6 +71,9 @@ public class Product {
     @OneToMany(mappedBy = "product")
     @JsonIgnore
     private List<Review> reviews = new ArrayList<>();
+
+    @ManyToOne
+    private Wishlist wishlist;
 
     @CreatedDate
     private LocalDateTime createdAt;

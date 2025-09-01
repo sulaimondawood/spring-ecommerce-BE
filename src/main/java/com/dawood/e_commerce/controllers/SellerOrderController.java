@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dawood.e_commerce.dtos.request.UpdateOrderRequest;
 import com.dawood.e_commerce.dtos.response.order.SellerOrderPagedResponse;
 import com.dawood.e_commerce.entities.SellerOrder;
+import com.dawood.e_commerce.entities.SellerReport;
+import com.dawood.e_commerce.services.SellerReportService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 public class SellerOrderController {
 
   private final SellerOrderService sellerOrderService;
+  private final SellerReportService sellerReportService;
 
   @GetMapping("/orders")
   public ResponseEntity<SellerOrderPagedResponse> getAllSellersOrders(
@@ -56,6 +59,11 @@ public class SellerOrderController {
   @GetMapping("/{orderId}/cancel")
   public ResponseEntity<SellerOrder> cancelOrder(@PathVariable UUID orderId) {
     return ResponseEntity.ok(sellerOrderService.cancelSellerOrder(orderId));
+  }
+
+  @GetMapping("/orders/report")
+  public ResponseEntity<SellerReport> getSellerReport() {
+    return ResponseEntity.ok().body(sellerReportService.getSellerReport());
   }
 
 }

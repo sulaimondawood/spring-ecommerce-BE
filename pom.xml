@@ -94,6 +94,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
+<dependency>
+ <groupId>com.flutterwave</groupId>
+    <artifactId>f4b-java</artifactId>
+    <version>3.0</version>
+</dependency>
 	</dependencies>
 
 	<build>
