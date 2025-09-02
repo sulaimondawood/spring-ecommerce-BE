@@ -78,6 +78,9 @@ public class User {
     @JsonIgnore
     private SellerReport sellerReport;
 
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Wishlist wishlist;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
